@@ -65,7 +65,20 @@ switch name1
     setIds=0; subdir='Daimler'; skip=1; ext='png'; vidIds={0};
   case 'pietro'
     setIds=0; subdir='Pietro'; skip=1; ext='jpg'; vidIds={0};
-  otherwise, error('unknown data type: %s',name);
+    
+  %SCUT FIR Pedestrian Datasets 101
+  case 'scut'
+    setIds=0:20; subdir='scut'; skip=20; ext='jpg';
+    vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0 ...
+            0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
+  case 'scuttrain'
+    setIds=0:10; subdir='scut'; skip=20; ext='jpg';
+    vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0};
+  case 'scuttest'
+    setIds=11:20; subdir='scut'; skip=20; ext='jpg';
+    vidIds={0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
+  
+    otherwise, error('unknown data type: %s',name);
 end
 
 % optionally select only specific set/vid if name ended in ints
