@@ -68,7 +68,7 @@ switch name1
     
   %SCUT FIR Pedestrian Datasets 101
   case 'scut'
-    setIds=0:20; subdir='scut'; skip=20; ext='jpg';
+    setIds=0:20; subdir='scut'; skip=4; ext='jpg';
     vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0 ...
             0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
   case 'scuttrain'
@@ -77,6 +77,19 @@ switch name1
   case 'scuttest'
     setIds=11:20; subdir='scut'; skip=20; ext='jpg';
     vidIds={0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
+  case 'scut02a'
+    setIds=0:20; subdir='scut'; skip=2; ext='jpg';
+    vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0 ...
+            0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
+  case 'scut6-10a'
+    setIds=6:10; subdir='scut'; skip=4; ext='jpg';
+    vidIds={0:6 0:1 0:2 0:1 0};
+  case 'scut11-15a'
+    setIds=11:15; subdir='scut'; skip=4; ext='jpg';
+    vidIds={0:3 0:3 0:1 0:2 0:11};
+  case 'scut16-20a'
+    setIds=16:20; subdir='scut'; skip=5; ext='jpg';
+    vidIds={0:9  0:7 0:1 0:2 0:1};
   
     otherwise, error('unknown data type: %s',name);
 end

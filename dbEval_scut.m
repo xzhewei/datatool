@@ -2,17 +2,17 @@ function dbEval_scut
 
 addpath(genpath('../toolbox'));
 % remove all the former results
-DIRS=dir('results');
-n=length(DIRS);
-for i=1:n
-    if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
-        if (DIRS(i).isdir)
-            rmdir(fullfile('results',DIRS(i).name),'s');
-        else
-            delete(fullfile('results',DIRS(i).name));
-        end
-    end
-end
+% DIRS=dir('results');
+% n=length(DIRS);
+% for i=1:n
+%     if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
+%         if (DIRS(i).isdir)
+%             rmdir(fullfile('results',DIRS(i).name),'s');
+%         else
+%             delete(fullfile('results',DIRS(i).name));
+%         end
+%     end
+% end
 
 % Evaluate and plot all pedestrian detection results.
 %
@@ -37,18 +37,19 @@ end
 % List of experiment settings: { name, hr, vr, ar, overlap, filter }
 %  name     - experiment name
 %  hr       - height range to test
-%  vr       - visibility range to test
+%  occ      - occ to test
 %  ar       - aspect ratio range to test
 %  overlap  - overlap threshold for evaluation
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
-  'Reasonable',     [50 inf], 1, 0, .5,  1.25
+%   'Reasonable',     [50 inf], 1, 0, .5,  1.25
   'All',            [20 inf], 1, 0, .5,  1.25
-  'Scale=medium'    [30  80], 0, 0, .5,  1.25
-  'Scale=far',      [20  30], 0, 0, .5,  1.25
-  'Occ=none',       [50 inf], 0, 0, .5,  1.25
-  'Overlap=50',     [50 inf], 1, 0, .50, 1.25
-  'Overlap=75',     [50 inf], 1, 0, .75, 1.25};
+%   'Scale=medium'    [30  80], 0, 0, .5,  1.25
+%   'Scale=far',      [20  30], 0, 0, .5,  1.25
+%   'Occ=none',       [50 inf], 0, 0, .5,  1.25
+%   'Overlap=50',     [50 inf], 1, 0, .50, 1.25
+%   'Overlap=75',     [50 inf], 1, 0, .75, 1.25
+  };
 exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 
 % List of algorithms: { name, resize, color, style }
@@ -59,13 +60,14 @@ exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
-  'RPN-ped',       0, clrs(6,:),   '-'
-  'RPN+BF',        0, clrs(7,:),   '-'
+%   'RPN-ped',       0, clrs(6,:),   '-'
+%   'RPN+BF',        0, clrs(7,:),   '-'
+  'RPN-ped_VGG16_scut_person_train04_all', 0, clrs(8,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'scuttest'};
+dataNames = {'scut'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
@@ -74,13 +76,13 @@ algs = algs(1);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
 aspectRatio = .41;        % default aspect ratio for all bbs
-bnds = [5 5 635 475];     % discard bbs outside this pixel range
+bnds = [5 5 715 571];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
-bbsShow = 0;              % if true displays sample bbs for each alg/exp
+bbsShow = 200;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 
 algs0=algs; bnds0=bnds;
@@ -128,7 +130,7 @@ for g=1:nGt
     fName = [plotName '/ev-' [stre '-' stra] '.mat'];
     if(exist(fName,'file')), R=load(fName); res(g,d)=R.R; continue; end
     fprintf('\tExp %i/%i, Alg %i/%i: %s/%s\n',g,nGt,d,nDt,stre,stra);
-    hr = exps(g).hr.*[1/exps(g).filter exps(g).filter];
+    hr = exps(g).hr.*[1/exps(g).filter exps(g).filter]; % expand bbox
     for f=1:n, bb=dt{f}; dt{f}=bb(bb(:,4)>=hr(1) & bb(:,4)<hr(2),:); end
     [gtr,dtr] = bbGt('evalRes',gt,dt,exps(g).overlap);
     R=struct('stra',stra,'stre',stre,'gtr',{gtr},'dtr',{dtr});
@@ -244,7 +246,7 @@ for g=1:nGt
     else
       switch type
         case 'dt', bbCol='y'; keep=dtr(:,6)>=0;
-        case 'fp', bbCol='r'; keep=dtr(:,6)==0;
+        case 'fp', bbCol='r'; keep=dtr(:,6)==0; keep=keep&dtr(:,5)>0.5;
         case 'tp', bbCol='y'; keep=dtr(:,6)==1;
       end
       [~,ord]=sort(dtr(keep,5),'descend');
@@ -253,7 +255,8 @@ for g=1:nGt
     end
     % prepare and display
     n=sum(keep); bbo1=cell(1,n); O=ones(1,size(indo,1));
-    ind=ind(keep,:); bb=bb(keep,:); ind=ind(ord,:); bb=bb(ord,:);
+    ind=ind(keep,:); bb=bb(keep,:);
+%     ind=ind(ord,:); bb=bb(ord,:);
     for f=1:n, bbo1{f}=bbo(all(indo==ind(O*f,:),2),:); end
     f=[plotName res(g,d).stre res(g,d).stra '-' type];
     plotBbSheet( bb, ind, bbo1,'fName',f,'pPage',pPage,'bbCol',bbCol,...
@@ -312,16 +315,33 @@ for page=1:min(pPage,ceil(n/mRows/nCols))
     % load and crop image region
     sr=seqIo(sprintf('%s/videos/set%02i/V%03i',dbInfo,ind(1),ind(2)),'r');
     sr.seek(ind(3)); I=sr.getframe(); sr.close();
+    % save I to file
+    if(1)
+        if(~exist(fName)), mkdir(fName); end;
+        h1=figure(f0);clf;       
+        prm=struct('hasChn',1,'showLines',0,'labels',{labels(f)});
+        montage2(I,prm); hold on;
+        bbApply('draw',bbAll(f0,:),bbCol,2,bbLst); bbApply('draw',bboAll{f0},bboCol,2,bboLst);
+        labels{f}=sprintf('%i-%i-%i',ind(1),ind(2),ind(3));
+        tfName = [fName '/' labels{f} '-' int2str2(f,2) '.png'];
+        if(exist(tfName,'file')), continue; end;
+        print(h1,'-dpng',tfName);
+%         savefig(tfName,h1(f),'png','-r200','-fonts');
+        close(h1);
+        h1=[]; % avoid error
+    end
     I=bbApply('crop',I,bb2,'replicate');
     I=uint8(imResample(double(I{1}),siz0*scale));
-    Is(:,:,:,f)=I;
+    Is(:,:,:,f)=I;  
   end
   % now plot all and save
+  if(0)
   prm=struct('hasChn',1,'padAmt',pad*2*scale,'padEl',0,'mm',mRows,...
     'showLines',0,'labels',{labels});
   h=figureResized(.9,1); clf; montage2(Is,prm); hold on;
   bbApply('draw',bbN,bbCol,2,bbLst); bbApply('draw',bboN,bboCol,2,bboLst);
-  savefig([fName int2str2(page-1,2)],h,'png','-r200','-fonts'); close(h);
+  savefig([fName int2str2(page-1,3)],h,'png','-r200','-fonts'); close(h);
+  end
   if(0), save([fName int2str2(page-1,2) '.mat'],'Is'); end
 end
 end
