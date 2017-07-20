@@ -63,6 +63,7 @@ algs = {
 %   'RPN-ped',       0, clrs(6,:),   '-'
 %   'RPN+BF',        0, clrs(7,:),   '-'
   'RPN-ped_VGG16_scut_person_train04_all', 0, clrs(8,:), '-'
+  'RPN+BF_VGG16_scut_person_train04_all', 0, clrs(8,:), '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
