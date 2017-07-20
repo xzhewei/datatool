@@ -42,8 +42,8 @@ addpath(genpath('../toolbox'));
 %  overlap  - overlap threshold for evaluation
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
-%   'Reasonable',     [50 inf], 1, 0, .5,  1.25
-  'All',            [20 inf], 1, 0, .5,  1.25
+  'Reasonable',     [50 inf], 1, 0, .5,  1.25
+  'All',            [30 inf], 1, 0, .5,  1.25
 %   'Scale=medium'    [30  80], 0, 0, .5,  1.25
 %   'Scale=far',      [20  30], 0, 0, .5,  1.25
 %   'Occ=none',       [50 inf], 0, 0, .5,  1.25
@@ -62,7 +62,7 @@ for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
 %   'RPN-ped',       0, clrs(6,:),   '-'
 %   'RPN+BF',        0, clrs(7,:),   '-'
-  'RPN-ped_VGG16_scut_person_train04_all', 0, clrs(8,:),   '-'
+  'RPN-ped_VGG16_scut_person_train04_all', 0, clrs(8,:), '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -76,13 +76,13 @@ algs = algs(1);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
 aspectRatio = .41;        % default aspect ratio for all bbs
-bnds = [5 5 715 571];     % discard bbs outside this pixel range
+bnds = [10 10 700 570];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
-bbsShow = 200;              % if true displays sample bbs for each alg/exp
+bbsShow = 3;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 
 algs0=algs; bnds0=bnds;

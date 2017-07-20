@@ -68,14 +68,14 @@ switch name1
     
   %SCUT FIR Pedestrian Datasets 101
   case 'scut'
-    setIds=0:20; subdir='scut'; skip=4; ext='jpg';
+    setIds=0:20; subdir='scut'; skip=25; ext='jpg';
     vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0 ...
             0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
   case 'scuttrain'
-    setIds=0:10; subdir='scut'; skip=20; ext='jpg';
+    setIds=0:10; subdir='scut'; skip=25; ext='jpg';
     vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0};
   case 'scuttest'
-    setIds=11:20; subdir='scut'; skip=20; ext='jpg';
+    setIds=11:20; subdir='scut'; skip=25; ext='jpg';
     vidIds={0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
   case 'scut02a'
     setIds=0:20; subdir='scut'; skip=2; ext='jpg';
