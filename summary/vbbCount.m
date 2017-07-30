@@ -1,17 +1,13 @@
 % 统计txt标注文件的信息
-function [allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount()
+function [allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount( path )
 close all;
 clear;
 clc;
 
-path = 'F:\DataSet\SCUT_FIR_101\datasets\annotations\';
+path = [path filesep 'annotations' filesep];
 txtNameList = dir([path '*.txt']);                                         % 读取 annotations 文件夹的所有 txt 文件
 load([path '..\road.mat']);                                                % load road sence info
-% l = {txtNameList.name};
-% l = cell2mat(l');
-% l = l(:,1:end-4);
-% l = mat2cell(l,ones(size(l,1),1),size(l,2));
-% road = [road,l];
+
 % 视频数量
 vbbNum = numel(txtNameList);
 

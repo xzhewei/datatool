@@ -1,6 +1,6 @@
 pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
 if (0)
-[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_datasets();
+[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_datasets( pth );
 save([pth 'analysis.mat']);
 else
 load([pth 'analysis.mat']);
