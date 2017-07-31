@@ -103,7 +103,12 @@ switch name1
   case 'kaist-place'
     setIds=0:5;     subdir='place'; skip=20; ext='png';     % Captured at 20fps
     vidIds={0:3 0:3 0:3 0:3 0:3 0:3 }; dbName = 'kaist-place';  
-
+  
+  % Add by Zhewei
+  case 'kaist-all'
+    setIds=0:11;    subdir='kaist'; skip=20; ext='jpg';
+    vidIds={0:8 0:5 0:4 0:1 0:1 0 0:4 0:2 0:2 0 0:1 0:1}; dbName = 'kaist';  
+  
   otherwise, error('unknown data type: %s',name);
 end
 

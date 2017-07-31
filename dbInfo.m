@@ -1,4 +1,4 @@
-function [pth,setIds,vidIds,skip,ext] = dbInfo( name1 )
+function [pth,setIds,vidIds,skip,ext,dbName] = dbInfo( name1, pth )
 % Specifies data amount and location.
 %
 % 'name' specifies the name of the dataset. Valid options include: 'Usa',
@@ -77,20 +77,29 @@ switch name1
   case 'scuttest'
     setIds=11:20; subdir='scut'; skip=25; ext='jpg';
     vidIds={0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
-  case 'scut02a'
-    setIds=0:20; subdir='scut'; skip=2; ext='jpg';
-    vidIds={0:2 0:3 0:1 0:2 0:11 0:10 0:6 0:1 0:2 0:1 0 ...
-            0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
-  case 'scut6-10a'
-    setIds=6:10; subdir='scut'; skip=4; ext='jpg';
-    vidIds={0:6 0:1 0:2 0:1 0};
-  case 'scut11-15a'
-    setIds=11:15; subdir='scut'; skip=4; ext='jpg';
-    vidIds={0:3 0:3 0:1 0:2 0:11};
-  case 'scut16-20a'
-    setIds=16:20; subdir='scut'; skip=5; ext='jpg';
-    vidIds={0:9  0:7 0:1 0:2 0:1};
   
+   % KAIST Multispectral Pedestrian Dataset (CVPR15)
+  case 'kaist-train-all'
+    setIds=0:5;     subdir='kaist'; skip=20; ext='png';     % Captured at 20fps
+    vidIds={0:8 0:5 0:4 0:1 0:1 0}; dbName = 'kaist';
+  case 'kaist-test-all'
+    setIds=6:11;    subdir='kaist'; skip=20; ext='png'; 
+    vidIds={0:4 0:2 0:2 0 0:1 0:1}; dbName = 'kaist';
+  case 'kaist-test-day'
+    setIds=6:8;    subdir='kaist-day'; skip=20; ext='png';
+    vidIds={0:4 0:2 0:2}; dbName = 'kaist';
+  case 'kaist-test-night'
+    setIds=9:11;    subdir='kaist-night'; skip=20; ext='png';
+    vidIds={0 0:1 0:1}; dbName = 'kaist';
+  % KAIST All-Day Visual Place Recognition Dataset (CVPRW15 - VPRICE))
+  case 'kaist-place'
+    setIds=0:5;     subdir='place'; skip=20; ext='png';     % Captured at 20fps
+    vidIds={0:3 0:3 0:3 0:3 0:3 0:3 }; dbName = 'kaist-place';
+  % Add by Zhewei
+  case 'kaist-all'
+    setIds=0:11;    subdir='kaist'; skip=20; ext='jpg';
+    vidIds={0:8 0:5 0:4 0:1 0:1 0 0:4 0:2 0:2 0 0:1 0:1}; dbName = 'kaist';
+
     otherwise, error('unknown data type: %s',name);
 end
 
@@ -99,7 +108,9 @@ if(~isempty(setId)), setIds=setIds(setId); vidIds=vidIds(setId); end
 if(~isempty(vidId)), vidIds={vidIds{1}(vidId)}; end
 
 % actual directory where data is contained
-pth=fileparts(mfilename('fullpath'));
-pth=[pth filesep 'data-' subdir];
+if ~exist( 'pth', 'var' )
+    pth=fileparts(mfilename('fullpath'));
+    pth=[pth filesep 'data-' subdir];
+end
 
 end

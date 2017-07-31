@@ -5,7 +5,7 @@ clear;
 clc;
 
 pth = 'F:\DataSet\KAIST\';
-[~,setIds,vidIds] = dbInfo3('kaist-all');
+[~,setIds,vidIds] = dbInfo('kaist-all');
 if (exist([pth 'road.mat'],'file'))
     load([pth 'road.mat']);                                                % load road sence info
 else

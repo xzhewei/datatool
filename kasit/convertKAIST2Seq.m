@@ -1,6 +1,7 @@
-[~,setIds,vidIds,dbName] = dbInfo2('kaist-all');
+[~,setIds,vidIds,~,~,dbName] = dbInfo('kaist-all');
 pth = 'F:/Code/method/piotr-toolbox-kaist/data-kaist';
 if(0)
+
 %% convert lwir imgs to avi
 type = 'lwir';
 for s=1:length(setIds)
@@ -29,7 +30,8 @@ for s=1:length(setIds)
       disp(sname);
   end
 end
- %% convert visible imgs to avi
+
+%% convert visible imgs to avi
 end
 if(0)
 type = 'visible';
@@ -60,6 +62,7 @@ for s=1:length(setIds)
   end
 end
 end
+
 %% conver avi to seq
 if(1)
 info.width = 0;

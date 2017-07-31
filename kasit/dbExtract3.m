@@ -23,11 +23,11 @@ function dbExtract3( pth, tDir, type, flatten, skip )
 % Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
 % Licensed under the Simplified BSD License [see external/bsd.txt]
 
-[~,setIds,vidIds,~,dbName] = dbInfo3();
-if(nargin<1 || isempty(pth)), pth=dbInfo3(); end
+[~,setIds,vidIds,~,~,dbName] = dbInfo();
+if(nargin<1 || isempty(pth)), pth=dbInfo(); end
 if(nargin<2 || isempty(tDir)), tDir=pth; end
 if(nargin<3 || isempty(flatten)), flatten=0; end
-if(nargin<4 || isempty(skip)), [~,~,~,skip]=dbInfo3(); end
+if(nargin<4 || isempty(skip)), [~,~,~,skip]=dbInfo(); end
 
 if strcmp( dbName, 'kaist' )
     % create local copy of fName which is in a imagesci/private

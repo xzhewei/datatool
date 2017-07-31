@@ -28,7 +28,7 @@ end
 % EXAMPLE
 %  dbEval
 %
-% See also bbGt, dbInfo3
+% See also bbGt, dbInfo
 %
 % Caltech Pedestrian Dataset     Version 3.2.1
 % Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
@@ -88,9 +88,9 @@ bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 algs0=algs; bnds0=bnds;
 for d=1:length(dataNames), dataName=dataNames{d};
   % select algorithms with results for current dataset
-  [~,set]=dbInfo3(dataName); set=['/set' int2str2(set(1),2)];
+  [~,set]=dbInfo(dataName); set=['/set' int2str2(set(1),2)];
   names={algs0.name}; n=length(names); keep=false(1,n);
-  for i=1:n, keep(i)=exist([dbInfo3 '/res/' names{i} set],'dir'); end
+  for i=1:n, keep(i)=exist([dbInfo '/res/' names{i} set],'dir'); end
   algs=algs0(keep);
   
   % handle special database specific cases
@@ -227,7 +227,7 @@ function plotBbs( res, plotName, pPage, type )
 % This function plots sample fp/tp/fn bbs for given algs/exps
 if(pPage==0), return; end; [nGt,nDt]=size(res);
 % construct set/vid/frame index for each image
-[~,setIds,vidIds,skip]=dbInfo3;
+[~,setIds,vidIds,skip]=dbInfo;
 k=length(res(1).gtr); is=zeros(k,3); k=0;
 for s=1:length(setIds)
   for v=1:length(vidIds{s})
@@ -320,7 +320,7 @@ for page=1:min(pPage,ceil(n/mRows/nCols))
     bb=bbApply('shift',bb,xdel,ydel); bbN=[bbN; bb]; %#ok<AGROW>
     bbo=bbApply('shift',bbo,xdel,ydel); bboN=[bboN; bbo]; %#ok<AGROW>
     % load and crop image region
-    sr=seqIo(sprintf('%s/videos/set%02i/V%03i',dbInfo3,ind(1),ind(2)),'r');
+    sr=seqIo(sprintf('%s/videos/set%02i/V%03i',dbInfo,ind(1),ind(2)),'r');
     sr.seek(ind(3)); I=sr.getframe(); sr.close();
     I=bbApply('crop',I,bb2,'replicate');
     I=uint8(imResample(double(I{1}),siz0*scale));
@@ -340,9 +340,9 @@ end
 
 function A = loadVbb( s, v )
 % Load given annotation (caches AS for speed).
-persistent AS pth sIds vIds; [pth1,sIds1,vIds1]=dbInfo3;
+persistent AS pth sIds vIds; [pth1,sIds1,vIds1]=dbInfo;
 if(~strcmp(pth,pth1) || ~isequal(sIds,sIds1) || ~isequal(vIds,vIds1))
-  [pth,sIds,vIds]=dbInfo3; AS=cell(length(sIds),1e3); end
+  [pth,sIds,vIds]=dbInfo; AS=cell(length(sIds),1e3); end
 A=AS{s,v}; if(~isempty(A)), return; end
 fName=@(s,v) sprintf('%s/annotations/set%02i/V%03i.txt',pth,s,v);
 A=vbb('vbbLoad',fName(sIds(s),vIds{s}(v))); AS{s,v}=A;
@@ -352,7 +352,7 @@ function gts = loadGt( exps, plotName, aspectRatio, bnds )
 % Load ground truth of all experiments for all frames.
 fprintf('Loading ground truth: %s\n',plotName);
 nExp=length(exps); gts=cell(1,nExp);
-[~,setIds,vidIds,skip] = dbInfo3;
+[~,setIds,vidIds,skip] = dbInfo;
 for i=1:nExp
   gName = [plotName '/gt-' exps(i).name '.mat'];
   if(exist(gName,'file')), gt=load(gName); gts{i}=gt.gt; continue; end
@@ -404,12 +404,12 @@ function dts = loadDt( algs, plotName, aspectRatio )
 % Load detections of all algorithm for all frames.
 fprintf('Loading detections: %s\n',plotName);
 nAlg=length(algs); dts=cell(1,nAlg);
-[~,setIds,vidIds,skip] = dbInfo3();
+[~,setIds,vidIds,skip] = dbInfo();
 for i=1:nAlg
   aName = [plotName '/dt-' algs(i).name '.mat'];
   if(exist(aName,'file')), dt=load(aName); dts{i}=dt.dt; continue; end
   fprintf('\tAlgorithm #%d: %s\n', i, algs(i).name);
-  dt=cell(1,100000); k=0; aDir=[dbInfo3 '/res/' algs(i).name];
+  dt=cell(1,100000); k=0; aDir=[dbInfo '/res/' algs(i).name];
   if(algs(i).resize), resize=100/128; else resize=1; end
   for s=1:length(setIds), s1=setIds(s);
     for v=1:length(vidIds{s}), v1=vidIds{s}(v);
