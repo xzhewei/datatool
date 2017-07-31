@@ -1,6 +1,6 @@
 function dbEval_kaist
 
-% addpath(genpath('../toolbox'));
+addpath(genpath('../toolbox'));
 % remove all the former results
 DIRS=dir('results');
 n=length(DIRS);
@@ -54,10 +54,8 @@ exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {
-  'VJ',                     0, clrs(1,:),   '-'
-  'HOG',                    1, clrs(2,:),   '--'
-  'RPN-ped',                0, clrs(6,:),   '-'
-  'RPN+BF',                 0, clrs(7,:),   '-'
+  'RPN-ped',       0, clrs(6,:),   '-'
+  'RPN+BF',        0, clrs(7,:),   '-'
   'RPN-ped-scales',         0, clrs(8,:),   '-'
   'RPN-ped-lwir',           0, clrs(9,:),   '-'
   'RPN-kv-ped-lwir',        0, clrs(10,:),  '-'
@@ -69,8 +67,7 @@ algs = {
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'kaist-lwir-all-test','UsaTest','UsaTrain','InriaTest',...
-  'TudBrussels','ETH','Daimler','Japan'};
+dataNames = {'kaist-all-test'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
@@ -360,14 +357,14 @@ for i=1:nExp
   gName = [plotName '/gt-' exps(i).name '.mat'];
   if(exist(gName,'file')), gt=load(gName); gts{i}=gt.gt; continue; end
   fprintf('\tExperiment #%d: %s\n', i, exps(i).name);
-  gt=cell(1,100000); k=0; lbls={'person','person?','cyclist','people','ignore'};
+  gt=cell(1,100000); k=0; lbls={'person','person?','cyclist','people'};
   filterGt = @(lbl,bb,occl) filterGtFun(lbl,bb,occl,...
     exps(i).hr,exps(i).vr,exps(i).ar,bnds,aspectRatio);
   for s=1:length(setIds)
     for v=1:length(vidIds{s})
       A = loadVbb(s,v);
       for f=skip-1:skip:A.nFrame-1
-        bb = vbb('frameAnn2',A,f+1,lbls,filterGt); ids=bb(:,5)~=1;
+        bb = vbb('frameAnn_kaist',A,f+1,lbls,filterGt); ids=bb(:,5)~=1;
         bb(ids,:)=bbApply('resize',bb(ids,:),1,0,aspectRatio);
         k=k+1; gt{k}=bb;
       end

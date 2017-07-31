@@ -758,6 +758,47 @@ end
 gt=gt(keep,:); lbls1=lbls1(keep); posv=posv(keep,:);
 end
 
+function [gt,occl,lbls1] = frameAnn_kaist( A, frame, lbls, test )
+% Returns the ground truth bbs for a single frame. For KAIST dataset
+%
+% Returns bbs for all object with lbl in lbls. The result is an [nx5] array
+% where each row is of the form [x y w h ignore]. [x y w h] is the bb and
+% ignore is a 0/1 flag that indicates regions to be ignored. For each
+% returned object, the ignore flag is set to 0 if test(lbl,pos,posv)=1 for
+% the given object. For example, using lbls={'person','people'}, and
+% test=@(lbl,bb,bbv) bb(4)>100, returns bbs for all 'person' and 'people'
+% in given frame, and for any objects under 100 pixels tall ignore=1.
+%
+% USAGE
+%  [gt,posv,lbls] = vbb( 'frameAnn', A, frame, lbls, [test] )
+%
+% INPUTS
+%  A        - annotation structure
+%  frame    - the frame index
+%  lbls     - cell array of string labels
+%  test     - [] ignore = ~test(lbl,pos,posv)
+%
+% OUTPUTS
+%  gt       - [n x 5] array containg ground truth for frame
+%  posv     - [n x 4] bbs of visible regions
+%  lbls     - [n x 1] list of object labels
+%
+% EXAMPLE
+%  lbls={'person','people'}; test=@(lbl,bb,bbv) bb(4)>100;
+%  [gt,lbls] = vbb( 'frameAnn', A, 200, lbls, test )
+
+if( nargin<4 ), test=[]; end; assert(frame<=A.nFrame);
+ng=length(A.objLists{frame}); ignore=0;
+gt=zeros(ng,5); occl=zeros(ng,1); lbls1=cell(1,ng); keep=true(1,ng);
+for g=1:ng
+  o=A.objLists{frame}(g); lbl=A.objLbl{o.id};
+  if(~any(strcmp(lbl,lbls))), keep(g)=0; continue; end
+  if(~isempty(test)), ignore=~test(lbl,o.pos,o.occl); end
+  gt(g,:)=[o.pos ignore]; lbls1{g}=lbl; occl(g,:)=o.occl;
+end
+gt=gt(keep,:); lbls1=lbls1(keep); occl=occl(keep,:);
+end
+
 function [gt,posv,lbls1] = frameAnn_scut( A, frame, lbls, test )
 % Returns the ground truth bbs for a single frame.
 %
