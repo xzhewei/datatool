@@ -42,8 +42,8 @@ addpath(genpath('../toolbox'));
 %  overlap  - overlap threshold for evaluation
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
-  'Reasonable',     [50 inf], 1, 0, .5,  1.25
-  'All',            [30 inf], 1, 0, .5,  1.25
+  'Reasonable',     [50 inf], {'none','partial'}, 0, .5,  1.25
+%   'All',            [30 inf], 1, 0, .5,  1.25
 %   'Scale=medium'    [30  80], 0, 0, .5,  1.25
 %   'Scale=far',      [20  30], 0, 0, .5,  1.25
 %   'Occ=none',       [50 inf], 0, 0, .5,  1.25
@@ -60,20 +60,19 @@ exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
-%   'RPN-ped',       0, clrs(6,:),   '-'
-%   'RPN+BF',        0, clrs(7,:),   '-'
-  'RPN-ped_VGG16_scut_person_train04_all', 0, clrs(8,:), '-'
-  'RPN+BF_VGG16_scut_person_train04_all', 0, clrs(8,:), '-'
+  'RPN-ped',       0, clrs(6,:),   '-'
+  'RPN+BF',        0, clrs(7,:),   '-'
+  'RPN-ped-kaist', 0, clrs(8,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'scut'};
+dataNames = {'scuttest'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
-exps = exps(:);           % select one or more experiment for evaluation
-algs = algs(1);           % select one or more algorithms for evaluation
+exps = exps(1);           % select one or more experiment for evaluation
+algs = algs(:);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
 aspectRatio = .41;        % default aspect ratio for all bbs
@@ -83,7 +82,7 @@ plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
-bbsShow = 3;              % if true displays sample bbs for each alg/exp
+bbsShow = 0;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 
 algs0=algs; bnds0=bnds;
@@ -180,7 +179,7 @@ for p=1:nPlots
   else
     xs1=xs(p,:); ys1=ys(p,:); fName1=[fName stre{p}]; lgd1=stra;
     for d=1:nDt, lgd1{d}=sprintf('%.2f%% %s',scores1(p,d),stra{d}); end
-    kp=[find(strcmp(stra,'VJ')) find(strcmp(stra,'HOG')) 1 1];
+    kp=[find(strcmp(stra,'VJ')) find(strcmp(stra,'HOG')) 2 1];
     [~,ord]=sort(scores(p,:)); kp=ord==kp(1)|ord==kp(2);
     j=find(cumsum(~kp)>=plotNum-2); kp(1:j(1))=1; ord=fliplr(ord(kp));
     xs1=xs1(ord); ys1=ys1(ord); lgd1=lgd1(ord); colors1=colors(ord,:);
@@ -385,10 +384,19 @@ for i=1:nExp
   gt=gt(1:k); gts{i}=gt; save(gName,'gt','-v6');
 end
 
-  function p = filterGtFun( lbl, bb, occl, hr, occ, ar, bnds, aspectRatio )
+  function p = filterGtFun( lbl, bb, occ, hr, vr, ar, bnds, aspectRatio )
     p=strcmp(lbl,'walk_person'); h=bb(4); 
     p=p & (h>=hr(1) & h<hr(2));
-    p=p & occl==occ;
+    %filter vRng
+    % For SCUT
+    vVal=0;
+    if any( ismember( vr, {'none'} ) ),        vVal=vVal+1;  end
+    if any( ismember( vr, {'partial'}) ),      vVal=vVal+2;  end
+    occ = 2^occ;
+		%if      objs(i).occ == 0,    objs(i).occ = 1;
+        %elseif  objs(i).occ == 1,    objs(i).occ = 2;
+        %end
+    p=p & bitand( occ, vVal );   
     if(ar~=0), p=p & sign(ar)*abs(bb(3)./bb(4)-aspectRatio)<ar; end
     p = p & bb(1)>=bnds(1) & (bb(1)+bb(3)<=bnds(3));
     p = p & bb(2)>=bnds(2) & (bb(2)+bb(4)<=bnds(4));
