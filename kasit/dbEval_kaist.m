@@ -54,23 +54,17 @@ exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {
-  'RPN-ped',       0, clrs(6,:),   '-'
-  'RPN+BF',        0, clrs(7,:),   '-'
-  'RPN-ped-scales',         0, clrs(8,:),   '-'
-  'RPN-ped-lwir',           0, clrs(9,:),   '-'
-  'RPN-kv-ped-lwir',        0, clrs(10,:),  '-'
-  'RPN-kv-ped-lwir_flip',   0, clrs(11,:),  '-'
-  'RPN-ped-visible',        0, clrs(11,:),  '-'
-  'RPN+BF-kaist-lwir'       0, clrs(12,:),  '-'
-  
+  'RPN-ped',               0, clrs(6,:),   '-'
+  'RPN+BF',                0, clrs(7,:),   '-'
+  'RPN-ped-scutrpn',       0, clrs(8,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'kaist-all-test'};
+dataNames = {'kaist-test-all','kaist-test-night'};
 
 % select databases, experiments and algorithms for evaluation
-dataNames = dataNames(1); % select one or more databases for evaluation
+dataNames = dataNames(2); % select one or more databases for evaluation
 exps = exps(1);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
