@@ -72,6 +72,10 @@ for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
   'RPN-ped',       0, clrs(6,:),   '-'
   'RPN+BF',        0, clrs(7,:),   '-'
+  'rpn',           0, clrs(8,:),   '-'
+  'fast-rcnn',     0, clrs(9,:),   '-'
+  'stage1-rpn',    0, clrs(11,:),   '-'
+  'stage1-fast_rcnn',    0, clrs(12,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -197,7 +201,7 @@ for p=1:nPlots
   else
     xs1=xs(p,:); ys1=ys(p,:); fName1=[fName stre{p}]; lgd1=stra;
     for d=1:nDt, lgd1{d}=sprintf('%.2f%% %s',scores1(p,d),stra{d}); end
-    kp=[find(strcmp(stra,'VJ')) find(strcmp(stra,'HOG')) 1 1];
+    kp=[find(strcmp(stra,'VJ')) find(strcmp(stra,'HOG')) 2 1];
     [~,ord]=sort(scores(p,:)); kp=ord==kp(1)|ord==kp(2);
     j=find(cumsum(~kp)>=plotNum-2); kp(1:j(1))=1; ord=fliplr(ord(kp));
     xs1=xs1(ord); ys1=ys1(ord); lgd1=lgd1(ord); colors1=colors(ord,:);
