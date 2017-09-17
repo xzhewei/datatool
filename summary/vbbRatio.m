@@ -1,12 +1,19 @@
 function vbbRatio
-pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
+pth = 'F:\DataSet\KAIST\';
 if ~exist('allbboxList', 'var')
     load([pth 'analysis.mat']);
 end
 
 % RENAME 
-type = 'walk_person';
-index = strcmp([allbboxList.label]',type);
+% type = 'Person';
+type = 'person'; % KAIST
+if (strcmp(type,'Person'))
+    index1 = strcmp([allbboxList.label]','walk_person');
+    index2 = strcmp([allbboxList.label]','ride_person');
+    index = index1 | index2;
+else
+    index = strcmp([allbboxList.label]',type);
+end
 ratio = [allbboxList(index).ratio];
 rmin = min(ratio);
 rmax = max(ratio);
@@ -36,13 +43,16 @@ set(raxes,'XMinorTick','on','XScale','linear','XTick',[0 0.2 0.4 0.6 0.8 1],...
     'YGrid','on','XLim',[0 1]);
 
 % Create title&save
-switch(type)
+switch(lower(type))
     case 'ride_person'
         title('Ride\_Person aspect ratio','FontSize',14);
-        saveas(rdist,[pth 'Ride_Person Aspect Ratio Distribution(Probability)'],'pdf');
+        saveas(rdist,[pth 'Ride_Person Aspect Ratio Distribution(Probability)'],'png');
     case 'walk_person'
         title('Walk\_Person aspect ratio','FontSize',14);
-        saveas(rdist,[pth 'Walk_Person Aspect Ratio Distribution(Probability)'],'pdf');
+        saveas(rdist,[pth 'Walk_Person Aspect Ratio Distribution(Probability)'],'png');
+    case 'person'
+        title('Person aspect ratio','FontSize',14);
+        saveas(rdist,[pth 'Person Aspect Ratio Distribution(Probability)'],'png');
 end
 
 % Summarize distribution parameters

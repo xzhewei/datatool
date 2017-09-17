@@ -1,10 +1,7 @@
 % 统计txt标注文件的信息
-function [allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_kaist()
-close all;
-clear;
-clc;
+function [allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_kaist(pth)
 
-pth = 'F:\DataSet\KAIST\';
+% pth = 'F:\DataSet\KAIST\';
 [~,setIds,vidIds] = dbInfo('kaist-all');
 if (exist([pth 'road.mat'],'file'))
     load([pth 'road.mat']);                                                % load road sence info

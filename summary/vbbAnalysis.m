@@ -1,6 +1,7 @@
-pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
-if (0)
-[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_datasets( pth );
+% pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
+pth = 'F:\DataSet\KAIST\';
+if (1)
+[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_kaist( pth );
 save([pth 'analysis.mat']);
 else
 load([pth 'analysis.mat']);

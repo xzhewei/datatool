@@ -1,13 +1,24 @@
 function vbbHist
-pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
+pth = 'F:\DataSet\KAIST\';
 if ~exist('allbboxList', 'var')
     load([pth 'analysis.mat']);
 end
 
 % RENAME
-type = 'walk_person';
-index = strcmp([allbboxList.label]',type);
+% type = 'Person';
+type = 'person'; % KAIST
+if (strcmp(type,'Person'))
+    index1 = strcmp([allbboxList.label]','walk_person');
+    index2 = strcmp([allbboxList.label]','ride_person');
+    index = index1 | index2;
+else
+    index = strcmp([allbboxList.label]',type);
+end
+
+    
 h = [allbboxList(index).pos_h];
+h = sort(h);
+kp = round(h(1:round(numel(h)/10):end));
 hmin = min(h);
 hmax = max(h);
 % log equal divid XTick
@@ -36,13 +47,16 @@ set(hpaxes,'XMinorTick','on','XScale','log','XTick',[0 16 32 64 128 256],...
     'YGrid','on','XLim',[0 256]);
 
 % Create title&save
-switch(type)
+switch(lower(type))
     case 'ride_person'
         title('Ride\_Person Height Distribution','FontSize',14);
-        saveas(hpdist,[pth 'Ride_Person Height Distribution(Probability)'],'pdf');
+        saveas(hpdist,[pth 'Ride_Person Height Distribution(Probability)'],'png');
     case 'walk_person'
         title('Walk\_Person Height Distribution','FontSize',14);
-        saveas(hpdist,[pth 'Walk_Person Height Distribution(Probability)'],'pdf');
+        saveas(hpdist,[pth 'Walk_Person Height Distribution(Probability)'],'png');
+    case 'person'
+        title('Person Height Distribution','FontSize',14);
+        saveas(hpdist,[pth 'Person Height Distribution(Probability)'],'png');
 end
 % RENAME % Save figure to Dataset Directory 
 % savefig([pth 'Ride_Person Height Distribution(Probability)'],hpdist,...
@@ -75,6 +89,9 @@ fprintf(file,'Far    less 45 pixel:            %.2f%% \n', N(1)*100);
 fprintf(file,'Medium range in 45 to 115 pixel: %.2f%% \n', N(2)*100);
 fprintf(file,'Near greater 115 pixel:          %.2f%% \n', N(3)*100);
 
+fprintf(file,[repmat('-',1,76) '\n']);
+fprintf(file,'Equal mount split 10 range, the 9 key point:\n');
+fprintf(file,'[%d %d %d %d %d %d %d %d %d]\n',kp(2:end));
 fclose(file);
 
 end
