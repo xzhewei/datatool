@@ -54,46 +54,20 @@ exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {
-  'RPN-ped-lwir',          0, clrs(5,:),   '-'
-  'RPN-ped',               0, clrs(6,:),   '-'
-  'RPN+BF',                0, clrs(7,:),   '-'
-  'stage1-rpn-0',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-0'     0, clrs(9,:),   '-'
-  'stage2-rpn-0',          0, clrs(10,:),  '-'
-  'fast-rcnn-0',           0, clrs(11,:),  '-'
-  'stage1-rpn-0-1',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-0-1'     0, clrs(9,:),   '-'
-  'stage2-rpn-0-1',          0, clrs(10,:),  '-'
-  'fast-rcnn-0-1',           0, clrs(11,:),  '-'
-  'stage1-rpn-1',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-1'     0, clrs(9,:),   '-'
-  'stage2-rpn-1',          0, clrs(10,:),  '-'
-  'fast-rcnn-1',           0, clrs(11,:),  '-'
-  'stage1-rpn-1-1',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-1-1'     0, clrs(9,:),   '-'
-  'stage2-rpn-1-1',          0, clrs(10,:),  '-'
-  'fast-rcnn-1-1',           0, clrs(11,:),  '-'
-  'stage1-rpn-2',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-2'     0, clrs(9,:),   '-'
-  'stage2-rpn-2',          0, clrs(10,:),  '-'
-  'fast-rcnn-2',           0, clrs(11,:),  '-'
-  'stage1-rpn-3',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-3'     0, clrs(9,:),   '-'
-  'stage2-rpn-3',          0, clrs(10,:),  '-'
-  'fast-rcnn-3',           0, clrs(11,:),  '-'
-  'stage1-rpn-3-2',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-3-2'     0, clrs(9,:),   '-'
-  'stage2-rpn-3-2',          0, clrs(10,:),  '-'
-  'fast-rcnn-3-2',           0, clrs(11,:),  '-'
-  'stage1-rpn-3-3',          0, clrs(8,:),   '-'
-  'stage1-fast-rcnn-3-3'     0, clrs(9,:),   '-'
-  'stage2-rpn-3-3',          0, clrs(10,:),  '-'
-  'fast-rcnn-3-3',           0, clrs(11,:),  '-'
+  'RPN-ped',       0, clrs(6,:),   '-'
+  'RPN+BF',        0, clrs(7,:),   '-'
+  'RPN-ped-scales',         0, clrs(8,:),   '-'
+  'RPN-ped-lwir',           0, clrs(9,:),   '-'
+  'RPN-kv-ped-lwir',        0, clrs(10,:),  '-'
+  'RPN-kv-ped-lwir_flip',   0, clrs(11,:),  '-'
+  'RPN-ped-visible',        0, clrs(11,:),  '-'
+  'RPN+BF-kaist-lwir'       0, clrs(12,:),  '-'
+  
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'kaist-test-all','kaist-test-night'};
+dataNames = {'kaist-all-test'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
@@ -105,7 +79,7 @@ aspectRatio = .41;        % default aspect ratio for all bbs
 bnds = [5 5 635 475];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
-plotNum = 10000;             % only show best plotNum curves (and VJ and HOG)
+plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
