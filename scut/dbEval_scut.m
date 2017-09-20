@@ -63,6 +63,8 @@ algs = {
   'RPN-ped',       0, clrs(6,:),   '-'
   'RPN+BF',        0, clrs(7,:),   '-'
   'RPN-ped-kaist', 0, clrs(8,:),   '-'
+  'stage1-rpn-0',  0, clrs(9,:),   '-'
+  'RPN-ped-skip25',0, clrs(10,:),  '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -385,7 +387,9 @@ for i=1:nExp
 end
 
   function p = filterGtFun( lbl, bb, occ, hr, vr, ar, bnds, aspectRatio )
-    p=strcmp(lbl,'walk_person'); h=bb(4); 
+    p=strcmp(lbl,'walk_person'); 
+    p=p|strcmp(lbl,'ride_person'); 
+    h=bb(4); 
     p=p & (h>=hr(1) & h<hr(2));
     %filter vRng
     % For SCUT
