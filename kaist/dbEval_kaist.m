@@ -54,20 +54,53 @@ exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {
-  'RPN-ped',       0, clrs(6,:),   '-'
-  'RPN+BF',        0, clrs(7,:),   '-'
-  'RPN-ped-scales',         0, clrs(8,:),   '-'
-  'RPN-ped-lwir',           0, clrs(9,:),   '-'
-  'RPN-kv-ped-lwir',        0, clrs(10,:),  '-'
-  'RPN-kv-ped-lwir_flip',   0, clrs(11,:),  '-'
-  'RPN-ped-visible',        0, clrs(11,:),  '-'
-  'RPN+BF-kaist-lwir'       0, clrs(12,:),  '-'
-  
+  'RPN-ped',                0, clrs(6,:),   '-'
+  'RPN+BF',                 0, clrs(7,:),   '-'
+  % Faster r-cnn config修改
+  'stage1-rpn-0',           0, clrs(10,:),  '-'
+  'stage2-rpn-0',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-0',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-0',     0, clrs(13,:),  '-'
+  % M1 conv5 增加hole
+  'stage1-rpn-1',           0, clrs(10,:),  '-'
+  'stage2-rpn-1',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-1',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-1',     0, clrs(13,:),  '-'
+  % M1-1 在M1的基础上修改test nms
+  'stage1-rpn-1-1',           0, clrs(10,:),  '-'
+  'stage2-rpn-1-1',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-1-1',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-1-1',     0, clrs(13,:),  '-'
+  % M2 增加输入图像尺寸1.5倍
+  'stage1-rpn-2',           0, clrs(10,:),  '-'
+  'stage2-rpn-2',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-2',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-2',     0, clrs(13,:),  '-'
+  % M3 修改anchor设置 scales = [45 52 57 63 71 80 92 109 140]/16, ratio = 1/0.44
+  'stage1-rpn-3',           0, clrs(10,:),  '-'
+  'stage2-rpn-3',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-3',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-3',     0, clrs(13,:),  '-'
+  % M3-2 修改nms
+  'stage1-rpn-3-2',           0, clrs(10,:),  '-'
+  'stage2-rpn-3-2',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-3-2',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-3-2',     0, clrs(13,:),  '-'
+  % M3-3 同上
+  'stage1-rpn-3-3',           0, clrs(10,:),  '-'
+  'stage2-rpn-3-3',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-3-3',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-3-3',     0, clrs(13,:),  '-'
+  % M4 去conv4的池化层
+  'stage1-rpn-4',           0, clrs(10,:),  '-'
+  'stage2-rpn-4',           0, clrs(11,:),  '-'
+  'stage1-fast-rcnn-4',     0, clrs(12,:),  '-'
+  'stage2-fast-rcnn-4',     0, clrs(13,:),  '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'kaist-all-test'};
+dataNames = {'kaist-test-all'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
@@ -79,7 +112,7 @@ aspectRatio = .41;        % default aspect ratio for all bbs
 bnds = [5 5 635 475];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
-plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
+plotNum = 1000;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
