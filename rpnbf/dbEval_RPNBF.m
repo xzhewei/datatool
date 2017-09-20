@@ -72,11 +72,13 @@ for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
   'RPN-ped',       0, clrs(6,:),   '-'
   'RPN+BF',        0, clrs(7,:),   '-'
-%   'rpn',           0, clrs(8,:),   '-'
-%   'fast-rcnn',     0, clrs(9,:),   '-'
-%   'stage1-rpn',    0, clrs(11,:),   '-'
   'stage1-fast-rcnn-0',    0, clrs(12,:),   '-'
   'stage2-fast-rcnn-0',    0, clrs(13,:),   '-'
+  % handle class imbalance
+  'stage1-rpn-0-1',        0, clrs(8,:),   '-'
+  'stage2-rpn-0-1',        0, clrs(9,:),   '-'
+  'stage1-fast-rcnn-0-1',  0, clrs(10,:),   '-'
+  'fast-rcnn-0-1',         0, clrs(11,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
