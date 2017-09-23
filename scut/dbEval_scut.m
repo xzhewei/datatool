@@ -60,11 +60,20 @@ exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
-  'RPN-ped',       0, clrs(6,:),   '-'
-  'RPN+BF',        0, clrs(7,:),   '-'
-  'RPN-ped-kaist', 0, clrs(8,:),   '-'
-  'stage1-rpn-0',  0, clrs(9,:),   '-'
-  'RPN-ped-skip25',0, clrs(10,:),  '-'
+%   'RPN-ped',       0, clrs(6,:),   '-'
+%   'RPN+BF',        0, clrs(7,:),   '-'
+  % 'RPN-ped-kaist', 0, clrs(8,:),   '-'
+  'RPN-skip01',        0, clrs(9,:),   '-'
+  'RPN-skip02',        0, clrs(10,:),   '-'
+  'RPN-skip04',        0, clrs(11,:),   '-'
+  'RPN-skip08',        0, clrs(12,:),   '-'
+  'RPN-skip10',        0, clrs(13,:),   '-'
+  'RPN-skip20',        0, clrs(14,:),   '-'
+  'RPN-skip25',        0, clrs(15,:),   '-'
+  'RPN-skip50',        0, clrs(16,:),   '-'
+  'RPN-skip75',        0, clrs(17,:),   '-'
+  'RPN-skip100',       0, clrs(18,:),   '-'
+%   'RPN-ped-M6',            0, clrs(17,:),   '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -77,11 +86,11 @@ exps = exps(1);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
-aspectRatio = .41;        % default aspect ratio for all bbs
+aspectRatio = .46;        % default aspect ratio for all bbs
 bnds = [10 10 700 570];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
-plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
+plotNum = 1000;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
@@ -388,8 +397,7 @@ end
 
   function p = filterGtFun( lbl, bb, occ, hr, vr, ar, bnds, aspectRatio )
     p=strcmp(lbl,'walk_person'); 
-    p=p|strcmp(lbl,'ride_person'); 
-    h=bb(4); 
+    p=p|strcmp(lbl,'ride_person'); h=bb(4); 
     p=p & (h>=hr(1) & h<hr(2));
     %filter vRng
     % For SCUT
