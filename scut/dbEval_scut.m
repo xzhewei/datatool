@@ -1,18 +1,20 @@
 function dbEval_scut
 
 addpath(genpath('../toolbox'));
+rmpath(genpath('../toolbox/external/other'));
 % remove all the former results
-% DIRS=dir('results');
-% n=length(DIRS);
-% for i=1:n
-%     if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
-%         if (DIRS(i).isdir)
-%             rmdir(fullfile('results',DIRS(i).name),'s');
-%         else
-%             delete(fullfile('results',DIRS(i).name));
-%         end
-%     end
-% end
+curdir = fileparts(mfilename('fullpath'));
+DIRS=dir(fullfile(curdir, 'results'));
+n=length(DIRS);
+for i=1:n
+    if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
+        if (DIRS(i).isdir)
+            rmdir(fullfile(curdir,'results',DIRS(i).name),'s');
+        else
+            delete(fullfile(curdir,'results',DIRS(i).name));
+        end
+    end
+end
 
 % Evaluate and plot all pedestrian detection results.
 %
@@ -43,12 +45,14 @@ addpath(genpath('../toolbox'));
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
   'Reasonable',     [50 inf], {'none','partial'}, 0, .5,  1.25
-%   'All',            [30 inf], 1, 0, .5,  1.25
-%   'Scale=medium'    [30  80], 0, 0, .5,  1.25
-%   'Scale=far',      [20  30], 0, 0, .5,  1.25
-%   'Occ=none',       [50 inf], 0, 0, .5,  1.25
-%   'Overlap=50',     [50 inf], 1, 0, .50, 1.25
-%   'Overlap=75',     [50 inf], 1, 0, .75, 1.25
+%   'Reasonable-walk-person',     [50 inf], {'none','partial'}, 0, .5,  1.25
+%   'Reasonable-ride-person',     [50 inf], {'none','partial'}, 0, .5,  1.25
+  'All',            [20 inf], {'none','partial'}, 0, .5,  1.25
+  'Scale=near',     [80 inf], {'none'},           0, .5,  1.25
+  'Scale=medium',   [30 80],  {'none'},           0, .5,  1.25
+  'Scale=far',      [20 30],  {'none'},           0, .5,  1.25
+  'Occ=none',       [50 inf], {'none'},           0, .5,  1.25
+  'Occ=partial',    [50 inf], {'partial'},        0, .5,  1.25
   };
 exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 
@@ -60,20 +64,14 @@ exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
-%   'RPN-ped',       0, clrs(6,:),   '-'
-%   'RPN+BF',        0, clrs(7,:),   '-'
-  % 'RPN-ped-kaist', 0, clrs(8,:),   '-'
-  'RPN-skip01',        0, clrs(9,:),   '-'
-  'RPN-skip02',        0, clrs(10,:),   '-'
-  'RPN-skip04',        0, clrs(11,:),   '-'
-  'RPN-skip08',        0, clrs(12,:),   '-'
-  'RPN-skip10',        0, clrs(13,:),   '-'
-  'RPN-skip20',        0, clrs(14,:),   '-'
-  'RPN-skip25',        0, clrs(15,:),   '-'
-  'RPN-skip50',        0, clrs(16,:),   '-'
-  'RPN-skip75',        0, clrs(17,:),   '-'
-  'RPN-skip100',       0, clrs(18,:),   '-'
-%   'RPN-ped-M6',            0, clrs(17,:),   '-'
+  'ACF-T'                   0, clrs(6,:),   '--'
+  'ACF-T+TM+TO',            0, clrs(7,:),   '-'
+  'ACF-T+THOG',             0, clrs(8,:),   '--'
+  'FRCN-vanilla'            0, clrs(9,:),   '-'
+  'RPN-vanilla',            0, clrs(10,:),  '--'
+  'TFRCN',                  0, clrs(12,:),  '-'
+  'RPN',                    0, clrs(11,:),  '--'
+  'RPN+BF',                 0, clrs(13,:),  '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -82,7 +80,7 @@ dataNames = {'scuttest'};
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
-exps = exps(1);           % select one or more experiment for evaluation
+exps = exps(:);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
@@ -92,7 +90,7 @@ plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 1000;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
-lims = [2e-4 50 .035 1];  % axis limits for ROC plots
+lims = [2e-4 10 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 
@@ -207,18 +205,26 @@ for p=1:nPlots
     set(gca,'XScale','log','YScale','log',...
       'YTick',[yt 1],'YTickLabel',[ytStr '1'],...
       'XMinorGrid','off','XMinorTic','off',...
-      'YMinorGrid','off','YMinorTic','off');
+      'YMinorGrid','off','YMinorTic','off',...
+      'FontSize',12,...
+      'Position',[0.0892561983471074 0.121145374449339 0.890743801652892 0.848854625550661]);
     xlabel('false positives per image','FontSize',14);
     ylabel('miss rate','FontSize',14); axis(lims);
+    set(gcf,'color',[1 1 1]);
   else
     x=1; for i=1:n, x=max(x,max(xs1{i})); end, x=min(x-mod(x,.1),1.0);
     y=.8; for i=1:n, y=min(y,min(ys1{i})); end, y=max(y-mod(y,.1),.01);
     xlim([0, x]); ylim([y, 1]); set(gca,'xtick',0:.1:1);
-    xlabel('Recall','FontSize',14); ylabel('Precision','FontSize',14);
+    xlabel('Recall','FontSize',12); ylabel('Precision','FontSize',12);
   end
-  if(~isempty(lgd1)), legend(h,lgd1,'Location','sw','FontSize',11); end
+  if(~isempty(lgd1)), legend1=legend(h,lgd1,'Location','sw','FontSize',12); end
   % save figure to disk (uncomment pdfcrop commands to automatically crop)
-  savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+%   savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+  set(legend1,...
+    'Position',[0.099783388917837 0.134820189049102 0.373256706510678 0.37183369001546],...
+    'FontSize',12);
+  saveas(1,[fName1 '.fig']); %close(1);
+  saveas(1,fName1,'pdf');
   if(0), setenv('PATH',[getenv('PATH') ':/usr/texbin/']); end
   if(0), system(['pdfcrop -margins ''-30 -20 -50 -10 '' ' ...
       fName1 '.pdf ' fName1 '.pdf']); end
@@ -396,8 +402,10 @@ for i=1:nExp
 end
 
   function p = filterGtFun( lbl, bb, occ, hr, vr, ar, bnds, aspectRatio )
-    p=strcmp(lbl,'walk_person'); 
-    p=p|strcmp(lbl,'ride_person'); h=bb(4); 
+    p=strcmp(lbl,'walk_person'); % for reasonable walk person
+    p=p|strcmp(lbl,'ride_person'); % for reasonable all
+    % p=strcmp(lbl,'ride_person'); % for reasonable ride person
+    h=bb(4); 
     p=p & (h>=hr(1) & h<hr(2));
     %filter vRng
     % For SCUT
