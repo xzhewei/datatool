@@ -1,15 +1,17 @@
 function dbEval_kaist
 
 addpath(genpath('../toolbox'));
+rmpath(genpath('../toolbox/external/other'));
 % remove all the former results
-DIRS=dir('results');
+curdir = fileparts(mfilename('fullpath'));
+DIRS=dir(fullfile(curdir, 'results'));
 n=length(DIRS);
 for i=1:n
     if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
         if (DIRS(i).isdir)
-            rmdir(fullfile('results',DIRS(i).name),'s');
+            rmdir(fullfile(curdir,'results',DIRS(i).name),'s');
         else
-            delete(fullfile('results',DIRS(i).name));
+            delete(fullfile(curdir,'results',DIRS(i).name));
         end
     end
 end
@@ -54,56 +56,22 @@ exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {
-  'RPN-ped',                0, clrs(6,:),   '-'
-  'RPN+BF',                 0, clrs(7,:),   '-'
-  % Faster r-cnn config修改
-  'stage1-rpn-0',           0, clrs(10,:),  '-'
-  'stage2-rpn-0',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-0',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-0',     0, clrs(13,:),  '-'
-  % M1 conv5 增加hole
-  'stage1-rpn-1',           0, clrs(10,:),  '-'
-  'stage2-rpn-1',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-1',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-1',     0, clrs(13,:),  '-'
-  % M1-1 在M1的基础上修改test nms
-  'stage1-rpn-1-1',           0, clrs(10,:),  '-'
-  'stage2-rpn-1-1',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-1-1',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-1-1',     0, clrs(13,:),  '-'
-  % M2 增加输入图像尺寸1.5倍
-  'stage1-rpn-2',           0, clrs(10,:),  '-'
-  'stage2-rpn-2',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-2',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-2',     0, clrs(13,:),  '-'
-  % M3 修改anchor设置 scales = [45 52 57 63 71 80 92 109 140]/16, ratio = 1/0.44
-  'stage1-rpn-3',           0, clrs(10,:),  '-'
-  'stage2-rpn-3',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-3',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-3',     0, clrs(13,:),  '-'
-  % M3-2 修改nms
-  'stage1-rpn-3-2',           0, clrs(10,:),  '-'
-  'stage2-rpn-3-2',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-3-2',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-3-2',     0, clrs(13,:),  '-'
-  % M3-3 同上
-  'stage1-rpn-3-3',           0, clrs(10,:),  '-'
-  'stage2-rpn-3-3',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-3-3',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-3-3',     0, clrs(13,:),  '-'
-  % M4 去conv4的池化层
-  'stage1-rpn-4',           0, clrs(10,:),  '-'
-  'stage2-rpn-4',           0, clrs(11,:),  '-'
-  'stage1-fast-rcnn-4',     0, clrs(12,:),  '-'
-  'stage2-fast-rcnn-4',     0, clrs(13,:),  '-'
+  'ACF-T'                   0, clrs(6,:),   '--'
+  'ACF-T+TM+TO',            0, clrs(7,:),   '-'
+  'ACF-T+THOG',             0, clrs(8,:),   '--'
+  'FRCN-vanilla'            0, clrs(9,:),   '-'
+  'RPN-vanilla',            0, clrs(10,:),  '--'
+  'TFRCN',                  0, clrs(12,:),  '-'
+  'RPN',                    0, clrs(11,:),  '--'
+  'RPN+BF',                 0, clrs(13,:),  '-'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'kaist-test-all'};
+dataNames = {'kaist-test-all','kaist-test-day','kaist-test-night'};
 
 % select databases, experiments and algorithms for evaluation
-dataNames = dataNames(1); % select one or more databases for evaluation
+dataNames = dataNames(:); % select one or more databases for evaluation
 exps = exps(1);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
@@ -112,7 +80,7 @@ aspectRatio = .41;        % default aspect ratio for all bbs
 bnds = [5 5 635 475];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
-plotNum = 1000;             % only show best plotNum curves (and VJ and HOG)
+plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
@@ -237,20 +205,28 @@ for p=1:nPlots
     set(gca,'XScale','log','YScale','log',...
       'YTick',[yt 1],'YTickLabel',[ytStr '1'],...
       'XMinorGrid','off','XMinorTic','off',...
-      'YMinorGrid','off','YMinorTic','off');
-    xlabel('false positives per image','FontSize',14);
-    ylabel('miss rate','FontSize',14); axis(lims);
+      'YMinorGrid','off','YMinorTic','off',...
+      'XTick',[0.001 0.01 0.1 1 10],...
+      'FontSize',9,...
+      'Position',[0.106182482118252 0.133058700491355 0.880590004654235 0.841609131469588]);
+    xlabel('false positives per image','FontSize',9);
+    ylabel('miss rate','FontSize',9); axis(lims);
+    set(gcf,'color',[1 1 1]);
   else
     x=1; for i=1:n, x=max(x,max(xs1{i})); end, x=min(x-mod(x,.1),1.0);
     y=.8; for i=1:n, y=min(y,min(ys1{i})); end, y=max(y-mod(y,.1),.01);
     xlim([0, x]); ylim([y, 1]); set(gca,'xtick',0:.1:1);
-    xlabel('Recall','FontSize',14); ylabel('Precision','FontSize',14);
+    xlabel('Recall','FontSize',14); ylabel('Precision','FontSize',9);
   end
-  if(~isempty(lgd1)), legend(h,lgd1,'Location','sw','FontSize',11); end
+  if(~isempty(lgd1)), legend1 = legend(h,lgd1,'Location','sw','FontSize',9); end
   % save figure to disk (uncomment pdfcrop commands to automatically crop)
-  savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+%   savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+  set(legend1,...
+    'Position',[0.116055536267493 0.147016897114508 0.48509320259053 0.44052595623054]);
+  saveas(1,fName1,'fig');
+  saveas(1,fName1,'pdf');
   if(0), setenv('PATH',[getenv('PATH') ':/usr/texbin/']); end
-  if(0), system(['pdfcrop -margins ''-30 -20 -50 -10 '' ' ...
+  if(1), system(['pdfcrop -margins ''-30 -20 -50 -10 '' ' ...
       fName1 '.pdf ' fName1 '.pdf']); end
 end
 
