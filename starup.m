@@ -1,5 +1,6 @@
 
 curdir = fileparts(mfilename('fullpath'));
+addpath(curdir);
 addpath(genpath(fullfile(curdir, 'kaist')));
 addpath(genpath(fullfile(curdir, 'rpnbf')));
 addpath(genpath(fullfile(curdir, 'scut')));
