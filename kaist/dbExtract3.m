@@ -29,15 +29,16 @@ if(nargin<2 || isempty(tDir)), tDir=pth; end
 if(nargin<3 || isempty(flatten)), flatten=0; end
 if(nargin<4 || isempty(skip)), [~,~,~,skip]=dbInfo(); end
 
-if strcmp( dbName, 'kaist' )
-    % create local copy of fName which is in a imagesci/private
-%     sName = [fileparts(which('imread.m')) filesep 'private' filesep 'pngreadc.mexw64'];
-    sName = [fileparts(which('imread.m')) filesep 'private' filesep 'pngreadc.mexa64'];
-    tName = ['.' filesep 'pngreadc.mexa64'];
-    if(~exist(tName,'file')), copyfile(sName,tName); end
-end
+% if strcmp( dbName, 'kaist' )
+%     % create local copy of fName which is in a imagesci/private
+% %     sName = [fileparts(which('imread.m')) filesep 'private' filesep 'pngreadc.mexw64'];
+%     sName = [fileparts(which('imread.m')) filesep 'private' filesep 'pngreadc.mexa64'];
+%     tName = ['.' filesep 'pngreadc.mexa64'];
+%     if(~exist(tName,'file')), copyfile(sName,tName); end
+% end
 
 for s=1:length(setIds)
+    ticId = ticStatus(['Extract set' num2str(setIds(s)) ':'],0.2,1);
   for v=1:length(vidIds{s})
     % load ground truth
     name=sprintf('set%02d/V%03d',setIds(s),vidIds{s}(v));
@@ -59,5 +60,6 @@ for s=1:length(setIds)
       caf=[pth '/annotations/' name '/' fs{i+1} '.txt'];
       copyfile(caf,taf);
     end
+    tocStatus(ticId,v/length(vidIds{s})); 
   end
 end
