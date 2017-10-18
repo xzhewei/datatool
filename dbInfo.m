@@ -86,10 +86,10 @@ switch name1
     setIds=6:11;    subdir='kaist'; skip=20; ext='png'; 
     vidIds={0:4 0:2 0:2 0 0:1 0:1}; dbName = 'kaist';
   case 'kaist-test-day'
-    setIds=6:8;    subdir='kaist-day'; skip=20; ext='png';
+    setIds=6:8;    subdir='kaist'; skip=20; ext='png';
     vidIds={0:4 0:2 0:2}; dbName = 'kaist';
   case 'kaist-test-night'
-    setIds=9:11;    subdir='kaist-night'; skip=20; ext='png';
+    setIds=9:11;    subdir='kaist'; skip=20; ext='png';
     vidIds={0 0:1 0:1}; dbName = 'kaist';
   % KAIST All-Day Visual Place Recognition Dataset (CVPRW15 - VPRICE))
   case 'kaist-place'
