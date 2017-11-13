@@ -2,8 +2,9 @@
 % 
 % Copyright (c) 2017, Zhewei Xu
 % -------------------------------------------------------
-pth = 'F:/DataSet/KAIST/data-kaist/';
-tDir = 'F:/DataSet/KAIST/data-kaist/extract/';
+function extract_img_anno_kaist(pth, tDir)
+% pth = 'F:/DataSet/KAIST/data-kaist/';
+% tDir = 'F:/DataSet/KAIST/data-kaist/extract/';
 
 % for s=1:2
 %   if(s==1), type='test'; skip=[]; else type='train'; skip=3; end
@@ -19,11 +20,13 @@ if(~exist([tDir type '/annotations'],'dir'))
     dbExtract3(pth,[tDir type],spec,1,skip); 
 end
 
-% type='train'; cond='all'; spec='lwir'; skip=75;
-% dbInfo(['kaist-' type '-' cond]);
-% type=[type '-' cond '-' spec '-' int2str2(skip,2)];
-% if(~exist([tDir type '/annotations'],'dir'))
-%     dbExtract3(pth,[tDir type],spec,1,skip); 
-% end
+type='train'; cond='all'; spec='lwir'; skip=3;
+dbInfo(['kaist-' type '-' cond]);
+type=[type '-' cond '-' spec '-' int2str2(skip,2)];
+if(~exist([tDir type '/annotations'],'dir'))
+    dbExtract3(pth,[tDir type],spec,1,skip); 
+end
+
+end
 
 

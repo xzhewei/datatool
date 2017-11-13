@@ -1,6 +1,6 @@
 function A = annSplit( filepath,objStr,splitFrame,label1,label2 )
-%UNTITLED 此处显示有关此函数的摘要
-%   此处显示详细说明
+% Use for vbbLabelerX
+% Split a continuous object into two
     A = vbb('vbbLoadTxt',filepath);
     id = find(A.objStr==objStr);
     obj1 = vbb( 'get', A, id, objStr,splitFrame-1);

@@ -5,7 +5,6 @@ H = 1.7;   % person high meter
 f = 1553.909; % focus length (pixel)
 lgd={};
 
-
 h = H.*f./d;
 fig = figure();
 axes1 = axes('Parent',fig);

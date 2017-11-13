@@ -1,7 +1,7 @@
 function dbEval_kaist
 
-addpath(genpath('../toolbox'));
-rmpath(genpath('../toolbox/external/other'));
+addpath(genpath('../cvtoolbox'));
+rmpath(genpath('../cvtoolbox/external/other'));
 % remove all the former results
 curdir = fileparts(mfilename('fullpath'));
 DIRS=dir(fullfile(curdir, 'results'));
