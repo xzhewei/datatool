@@ -1,8 +1,8 @@
 [~,setIds,vidIds,~,~,dbName] = dbInfo('kaist-all');
 pth = 'F:/Code/method/piotr-toolbox-kaist/data-kaist';
-if(0)
 
 %% convert lwir imgs to avi
+if(0)
 type = 'lwir';
 for s=1:length(setIds)
       tDir = sprintf('F:/KAIST/avi/set%02d',setIds(s));
@@ -30,9 +30,9 @@ for s=1:length(setIds)
       disp(sname);
   end
 end
+end
 
 %% convert visible imgs to avi
-end
 if(0)
 type = 'visible';
 for s=1:length(setIds)
