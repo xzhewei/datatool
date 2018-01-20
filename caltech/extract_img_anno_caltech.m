@@ -7,17 +7,17 @@ function extract_img_anno_caltech(pth, tDir)
 % tDir = 'F:\DataSet\SCUT_FIR_101\datasets\extract\';
 
 type='test'; skip=30;
-dbInfo(['scut' type]);
+dbInfo(['usa' type]);
 type=['test' int2str2(skip,2)];
 if(~exist([tDir type '/annotations'],'dir'))
-    dbExtract_scut([tDir type],1,skip,pth); 
+    dbExtract_caltech([tDir type],1,skip,pth); 
 end
 
 type='train'; skip=4;
-dbInfo(['scut' type]);
+dbInfo(['usa' type]);
 type=['train' int2str2(skip,2)];
 if(~exist([tDir type '/annotations'],'dir'))
-    dbExtract_scut([tDir type],1,skip,pth); 
+    dbExtract_caltech([tDir type],1,skip,pth); 
 end
 
 end
