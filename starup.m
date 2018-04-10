@@ -7,3 +7,4 @@ addpath(genpath(fullfile(curdir, 'scut')));
 addpath(genpath(fullfile(curdir, 'util')));
 addpath(genpath(fullfile(curdir, 'summary')));
 cd(curdir);
+addpath(genpath(fullfile(curdir, '../toolbox')));

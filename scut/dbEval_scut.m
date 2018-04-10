@@ -72,6 +72,8 @@ algs = {
   'TFRCN',                  0, clrs(12,:),  '-'
   'RPN',                    0, clrs(11,:),  '--'
   'RPN+BF',                 0, clrs(13,:),  '-'
+  % mscnn experiment
+  'mscnn_4s_480_20k_test_ped',0,clrs(14,:), '--'
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -206,7 +208,7 @@ for p=1:nPlots
       'YTick',[yt 1],'YTickLabel',[ytStr '1'],...
       'XMinorGrid','off','XMinorTic','off',...
       'YMinorGrid','off','YMinorTic','off',...
-      'FontSize',12,...
+      'FontSize',12);
       %'Position',[0.0892561983471074 0.121145374449339 0.890743801652892 0.848854625550661]);
     xlabel('false positives per image','FontSize',14);
     ylabel('miss rate','FontSize',14); axis(lims);
@@ -219,11 +221,11 @@ for p=1:nPlots
   end
   if(~isempty(lgd1)), legend1=legend(h,lgd1,'Location','sw','FontSize',12); end
     %save figure to disk (uncomment pdfcrop commands to automatically crop)
-     savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+%      savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
 %   set(legend1,...
 %     'Position',[0.099783388917837 0.134820189049102 0.373256706510678 0.37183369001546],...
 %     'FontSize',12);
-%   saveas(1,[fName1 '.fig']); %close(1);
+  saveas(1,[fName1 '.pdf']); %close(1);
   %saveas(1,fName1,'pdf');
   if(0), setenv('PATH',[getenv('PATH') ':/usr/texbin/']); end
   if(0), system(['pdfcrop -margins ''-30 -20 -50 -10 '' ' ...
