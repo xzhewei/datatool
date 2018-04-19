@@ -77,11 +77,23 @@ switch name1
   case 'scuttest'
     setIds=11:20; subdir='scut'; skip=25; ext='jpg';
     vidIds={0:3 0:3 0:1 0:2 0:11 0:9  0:7 0:1 0:2 0:1};
+  case 'scuttrain-diff'
+    setIds=[0:4 11:15]; subdir='scut'; skip=25; ext='jpg';
+    vidIds={0:2 0:3 0:1 0:2 0:11 0:3 0:3 0:1 0:2 0:11};
+  case 'scuttest-diff'
+    setIds=[5:10 16:20]; subdir='scut'; skip=25; ext='jpg';
+    vidIds={0:10 0:6 0:1 0:2 0:1 0 0:9  0:7 0:1 0:2 0:1};
   
    % KAIST Multispectral Pedestrian Dataset (CVPR15)
   case 'kaist-train-all'
     setIds=0:5;     subdir='kaist'; skip=20; ext='png';     % Captured at 20fps
     vidIds={0:8 0:5 0:4 0:1 0:1 0}; dbName = 'kaist';
+  case 'kaist-train-day'
+    setIds=0:2;     subdir='kaist'; skip=20; ext='png';
+    vidIds={0:8 0:5 0:4}; dbName = 'kaist';
+  case 'kaist-train-night'
+    setIds=3:5;     subdir='kaist'; skip=20; ext='png';
+    vidIds={0:1 0:1 0}; dbName='kaist';
   case 'kaist-test-all'
     setIds=6:11;    subdir='kaist'; skip=20; ext='png'; 
     vidIds={0:4 0:2 0:2 0 0:1 0:1}; dbName = 'kaist';
