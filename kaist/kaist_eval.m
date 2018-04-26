@@ -1,4 +1,4 @@
-function caltech_eval(res_dir, output_dir, alg_name)
+function kaist_eval(res_dir, output_dir, alg_name)
 % Copyright (c) 2018, Zhewei Xu
 % [xzhewei-at-gmail.com]
 % Licensed under The MIT License [see LICENSE for details]
@@ -6,27 +6,26 @@ function caltech_eval(res_dir, output_dir, alg_name)
 addpath(genpath('toolbox'));
 
 exps = {
-  'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
-  'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
-  'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
-  'Scale=near',     [80 inf],  [inf inf], 0,   .5,  1.25
-  'Scale=medium',   [30 80],   [inf inf], 0,   .5,  1.25
-  'Scale=far',      [20 30],   [inf inf], 0,   .5,  1.25
-  'Occ=none',       [50 inf],  [inf inf], 0,   .5,  1.25
-  'Occ=partial',    [50 inf],  [.65 1],   0,   .5,  1.25
-  'Occ=heavy',      [50 inf],  [.2 .65],  0,   .5,  1.25
-  'Ar=all',         [50 inf],  [inf inf], 0,   .5,  1.25
-  'Ar=typical',     [50 inf],  [inf inf],  .1, .5,  1.25
-  'Ar=atypical',    [50 inf],  [inf inf], -.1, .5,  1.25
-  'Overlap=25',     [50 inf],  [.65 inf], 0,   .25, 1.25
-  'Overlap=50',     [50 inf],  [.65 inf], 0,   .50, 1.25
-  'Overlap=75',     [50 inf],  [.65 inf], 0,   .75, 1.25
-  'Expand=100',     [50 inf],  [.65 inf], 0,   .5,  1.00
-  'Expand=125',     [50 inf],  [.65 inf], 0,   .5,  1.25
-  'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 };
+  'Reasonable',     [55 inf],  {'none','partial'}, 0,   .5,  1.25
+  'All',            [20 inf],  {'none','partial','heavy'},  0,   .5,  1.25
+  'Scale=near',     [115 inf], {'none'}, 0,   .5,  1.25
+  'Scale=medium',   [45 115],  {'none'}, 0,   .5,  1.25
+  'Scale=far',      [1 45],    {'none'}, 0,   .5,  1.25
+  'Occ=none',       [55 inf],  {'none'}, 0,   .5,  1.25
+  'Occ=partial',    [55 inf],  {'partial'},   0,   .5,  1.25
+  'Occ=heavy',      [55 inf],  {'heavy'},  0,   .5,  1.25
+  'Ar=all',         [55 inf],  {'none'}, 0,   .5,  1.25
+  'Ar=typical',     [55 inf],  {'none'},  .1, .5,  1.25
+  'Ar=atypical',    [55 inf],  {'none'}, -.1, .5,  1.25
+  'Overlap=25',     [55 inf],  {'none','partial'}, 0,   .25, 1.25
+  'Overlap=50',     [55 inf],  {'none','partial'}, 0,   .50, 1.25
+  'Overlap=75',     [55 inf],  {'none','partial'}, 0,   .75, 1.25
+  'Expand=100',     [55 inf],  {'none','partial'}, 0,   .5,  1.00
+  'Expand=125',     [55 inf],  {'none','partial'}, 0,   .5,  1.25
+  'Expand=150',     [55 inf],  {'none','partial'}, 0,   .5,  1.50 };
 exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 
-dataNames = {'UsaTest'};
+dataNames = {'kaist-test-all','kaist-test-day','kaist-test-night'};
 
 % remaining parameters and constants
 aspectRatio = .41;        % default aspect ratio for all bbs
@@ -52,22 +51,22 @@ end
 
 for d=1:length(dataNames), dataName=dataNames{d};
 dbInfo(dataName);
-output_dir = [output_dir '/' dataName];
-if (~exist(output_dir,'dir')), mkdir(output_dir); end
+output_data_dir = [output_dir '/' dataName];
+if (~exist(output_data_dir,'dir')), mkdir(output_data_dir); end
 
 % load detections and ground truth and evaluate
-dts = loadDt( algs, res_dir, output_dir, aspectRatio );
-gts = loadGt( exps, output_dir, aspectRatio, bnds );
-res = evalAlgs( output_dir, algs, exps, gts, dts );
+dts = loadDt( algs, res_dir, output_data_dir, aspectRatio );
+gts = loadGt( exps, output_data_dir, aspectRatio, bnds );
+res = evalAlgs( output_data_dir, algs, exps, gts, dts );
 
 % plot curves and bbs
 fprintf('MR-2 (FPPI in [%e,%e])\n',samplesMR2(1),samplesMR2(end));
-plotExps( res, plotRoc, plotAlg, plotNum, [output_dir '-MR2'], ...
+plotExps( res, plotRoc, plotAlg, plotNum, [output_data_dir '-MR2'], ...
   samplesMR2, lims, reshape([algs.color]',3,[])', {algs.style} );
 fprintf('MR-4 (FPPI in [%e,%e])\n',samplesMR4(1),samplesMR4(end));
-plotExps( res, plotRoc, plotAlg, plotNum, [output_dir '-MR4'], ...
+plotExps( res, plotRoc, plotAlg, plotNum, [output_data_dir '-MR4'], ...
   samplesMR4, lims, reshape([algs.color]',3,[])', {algs.style} );
-plotBbs( res, output_dir, bbsShow, bbsType );
+plotBbs( res, output_data_dir, bbsShow, bbsType );
 
 end
 end
@@ -299,7 +298,7 @@ persistent AS pth sIds vIds; [pth1,sIds1,vIds1]=dbInfo;
 if(~strcmp(pth,pth1) || ~isequal(sIds,sIds1) || ~isequal(vIds,vIds1))
   [pth,sIds,vIds]=dbInfo; AS=cell(length(sIds),1e3); end
 A=AS{s,v}; if(~isempty(A)), return; end
-fName=@(s,v) sprintf('%s/annotations/set%02i/V%03i',pth,s,v);
+fName=@(s,v) sprintf('%s/annotations/set%02i/V%03i.txt',pth,s,v);
 A=vbb('vbbLoad',fName(sIds(s),vIds{s}(v))); AS{s,v}=A;
 end
 
@@ -312,14 +311,14 @@ for i=1:nExp
   gName = [output_dir '/gt-' exps(i).name '.mat'];
   if(exist(gName,'file')), gt=load(gName); gts{i}=gt.gt; continue; end
   fprintf('\tExperiment #%d: %s\n', i, exps(i).name);
-  gt=cell(1,100000); k=0; lbls={'person','person?','people','ignore'};
-  filterGt = @(lbl,bb,bbv) filterGtFun(lbl,bb,bbv,...
+  gt=cell(1,100000); k=0; lbls={'person','person?','cyclist','people'};
+  filterGt = @(lbl,bb,occl) filterGtFun(lbl,bb,occl,...
     exps(i).hr,exps(i).vr,exps(i).ar,bnds,aspectRatio);
   for s=1:length(setIds)
     for v=1:length(vidIds{s})
       A = loadVbb(s,v);
       for f=skip-1:skip:A.nFrame-1
-        bb = vbb('frameAnn',A,f+1,lbls,filterGt); ids=bb(:,5)~=1;
+        bb = vbb('frameAnn_kaist',A,f+1,lbls,filterGt); ids=bb(:,5)~=1;
         bb(ids,:)=bbApply('resize',bb(ids,:),1,0,aspectRatio);
         k=k+1; gt{k}=bb;
       end
@@ -328,13 +327,30 @@ for i=1:nExp
   gt=gt(1:k); gts{i}=gt; save(gName,'gt','-v6');
 end
 
-  function p = filterGtFun( lbl, bb, bbv, hr, vr, ar, bnds, aspectRatio )
+  function p = filterGtFun( lbl, bb, occ, hr, vr, ar, bnds, aspectRatio )
+    % filter label?
     p=strcmp(lbl,'person'); h=bb(4); p=p & (h>=hr(1) & h<hr(2));
-    if(all(bbv==0)), vf=inf; else vf=bbv(3).*bbv(4)./(bb(3)*bb(4)); end
-    p=p & vf>=vr(1) & vf<=vr(2);
+    
+    %filter vRng
+    % For KAIST-MultispectralDB
+    vVal=0;
+    if any( ismember( vr, {'none'} ) ),        vVal=vVal+1;  end
+    if any( ismember( vr, {'partial'}) ),      vVal=vVal+2;  end
+    if any( ismember( vr, {'heavy'} ) ),       vVal=vVal+4;  end
+    occ = 2^occ;
+    %if      objs(i).occ == 0,    objs(i).occ = 1;
+        %elseif  objs(i).occ == 1,    objs(i).occ = 2;
+        %elseif  objs(i).occ == 2,    objs(i).occ = 4;
+        %end
+    p=p & bitand( occ, vVal );   
+    
+    %filter aspectRatio
     if(ar~=0), p=p & sign(ar)*abs(bb(3)./bb(4)-aspectRatio)<ar; end
     p = p & bb(1)>=bnds(1) & (bb(1)+bb(3)<=bnds(3));
     p = p & bb(2)>=bnds(2) & (bb(2)+bb(4)<=bnds(4));
+  %     if(~p) % debug
+  %        pause(1); 
+  %     end
   end
 end
 
