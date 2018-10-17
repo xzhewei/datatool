@@ -1,7 +1,7 @@
 function dbEval_kaist
 
-addpath(genpath('../cvtoolbox'));
-rmpath(genpath('../cvtoolbox/external/other'));
+addpath(genpath('../toolbox'));
+rmpath(genpath('../toolbox/external/other'));
 % remove all the former results
 curdir = fileparts(mfilename('fullpath'));
 DIRS=dir(fullfile(curdir, 'results'));
@@ -59,11 +59,10 @@ algs = {
   'ACF-T'                   0, clrs(6,:),   '--'
   'ACF-T+TM+TO',            0, clrs(7,:),   '-'
   'ACF-T+THOG',             0, clrs(8,:),   '--'
-  'FRCN-vanilla'            0, clrs(9,:),   '-'
-  'RPN-vanilla',            0, clrs(10,:),  '--'
-  'TFRCN',                  0, clrs(12,:),  '-'
-  'RPN',                    0, clrs(11,:),  '--'
-  'RPN+BF',                 0, clrs(13,:),  '-'
+  'FRCN-vanilla',           0, clrs(9,:),   '-'
+  'MSCNN',                  0, clrs(10,:),  '-'
+  'RPN+BF',                 0, clrs(11,:),  '--' 
+  'FRCN-Ped',               0, clrs(12,:),  '-' 
 };
 algs=cell2struct(algs',{'name','resize','color','style'});
 
@@ -207,11 +206,10 @@ for p=1:nPlots
       'XMinorGrid','off','XMinorTic','off',...
       'YMinorGrid','off','YMinorTic','off',...
       'XTick',[0.001 0.01 0.1 1 10],...
-      'FontSize',9,...
-      'Position',[0.106182482118252 0.133058700491355 0.880590004654235 0.841609131469588]);
+      'FontSize',9);
     xlabel('false positives per image','FontSize',9);
     ylabel('miss rate','FontSize',9); axis(lims);
-    set(gcf,'color',[1 1 1]);
+    set(gcf,'color',[1 1 1],'PaperOrientation','landscape','PaperType','<custom>','PaperSize',[10 7.6],'Renderer','painters');
   else
     x=1; for i=1:n, x=max(x,max(xs1{i})); end, x=min(x-mod(x,.1),1.0);
     y=.8; for i=1:n, y=min(y,min(ys1{i})); end, y=max(y-mod(y,.1),.01);
@@ -221,8 +219,8 @@ for p=1:nPlots
   if(~isempty(lgd1)), legend1 = legend(h,lgd1,'Location','sw','FontSize',9); end
   % save figure to disk (uncomment pdfcrop commands to automatically crop)
 %   savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
-  set(legend1,...
-    'Position',[0.116055536267493 0.147016897114508 0.48509320259053 0.44052595623054]);
+%   set(legend1,...
+%     'Position',[0.116055536267493 0.147016897114508 0.48509320259053 0.44052595623054]);
   saveas(1,fName1,'fig');
   saveas(1,fName1,'pdf');
   if(0), setenv('PATH',[getenv('PATH') ':/usr/texbin/']); end

@@ -1,4 +1,4 @@
-function caltech_eval(res_dir, output_dir, alg_name)
+function scut_eval(res_dir, output_dir, alg_name)
 % Copyright (c) 2018, Zhewei Xu
 % [xzhewei-at-gmail.com]
 % Licensed under The MIT License [see LICENSE for details]
