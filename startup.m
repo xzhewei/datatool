@@ -8,3 +8,4 @@ addpath(genpath(fullfile(curdir, 'util')));
 addpath(genpath(fullfile(curdir, 'summary')));
 cd(curdir);
 addpath(genpath(fullfile(curdir, '../toolbox')));
+rmpath(genpath(fullfile(curdir,'../toolbox/external/other')));
