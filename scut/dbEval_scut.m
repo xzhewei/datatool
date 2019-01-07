@@ -1,7 +1,7 @@
 function dbEval_scut
 
-addpath(genpath('../toolbox'));
-rmpath(genpath('../toolbox/external/other'));
+% addpath(genpath('../toolbox'));
+% rmpath(genpath('../toolbox/external/other'));
 % remove all the former results
 % curdir = fileparts(mfilename('fullpath'));
 % DIRS=dir(fullfile(curdir, 'results'));
@@ -44,15 +44,16 @@ rmpath(genpath('../toolbox/external/other'));
 %  overlap  - overlap threshold for evaluation
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
-  'Reasonable',     [50 inf], {'none','partial'}, 0, .5,  1.25
+%   'Reasonable',     [50 inf], {'none','partial'}, 0, .5,  1.25
 %  'Reasonable-walk-person',     [50 inf], {'none','partial'}, 0, .5,  1.25
 %  'Reasonable-ride-person',     [50 inf], {'none','partial'}, 0, .5,  1.25
   'All',            [20 inf], {'none','partial'}, 0, .5,  1.25
-  'Scale=near',     [80 inf], {'none'},           0, .5,  1.25
-  'Scale=medium',   [30 80],  {'none'},           0, .5,  1.25
-  'Scale=far',      [20 30],  {'none'},           0, .5,  1.25
-  'Occ=none',       [50 inf], {'none'},           0, .5,  1.25
-  'Occ=partial',    [50 inf], {'partial'},        0, .5,  1.25
+%   'Scale=near',     [80 inf], {'none'},           0, .5,  1.25
+%   'Scale=medium',   [30 80],  {'none'},           0, .5,  1.25
+%   'Scale=far',      [20 30],  {'none'},           0, .5,  1.25
+%   'Occ=none',       [50 inf], {'none'},           0, .5,  1.25
+%   'Occ=partial',    [50 inf], {'partial'},        0, .5,  1.25
+%     'ROI',            [30 140], {'none','partial'}, 0, .5,  1.25
   };
 exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 
@@ -64,35 +65,54 @@ exps=cell2struct(exps',{'name','hr','occ','ar','overlap','filter'});
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs = {  
-  %'ACF-T'                   0, clrs(6,:),   '--'
-  %'ACF-T+TM+TO',            0, clrs(7,:),   '-'
+  'ACF-T'                   0, clrs(6,:),   '--'
+%   'ACF-T+TM+TO',            0, clrs(7,:),   '-'
   'ACF-T+THOG',             0, clrs(8,:),   '--'
   'FRCN-vanilla'            0, clrs(9,:),   '-'
   'RPN-vanilla',            0, clrs(10,:),  '--'
   'FRCN-our',                  0, clrs(12,:),  '-'
   'RPN',                    0, clrs(11,:),  '--'
   'RPN+BF',                 0, clrs(13,:),  '-'
-  % mscnn experiment
+%   % mscnn experiment
   'MSCNN',                  0,clrs(14,:), '--'
   'YOLOv2',                 0,clrs(15,:), '-'
   'YOLOv3',                 0,clrs(16,:), '--'
+    % Fast-EdgeBox
+%     'DTS',                 0,clrs(17,:), '-'
+%     'DTS-H',                 0,clrs(18,:), '-'
+%     'DTS-S',                 0,clrs(19,:), '-'
+%     'EdgeBox',                 0,clrs(20,:), '-'
+%     'Fast-EdgeBox',                 0,clrs(21,:), '-'
+%     'Fast-EdgeBox-S',                 0,clrs(22,:), '-'
+%     'Fast-EdgeBox-T',                 0,clrs(23,:), '-'
+%     'Fast-EdgeBox-T-S',                 0,clrs(24,:), '-'
+%     'Fast-EdgeBox-V',                 0,clrs(25,:), '-'
+%     'Fast-EdgeBox-V-S',                 0,clrs(26,:), '-'
+%     'Fast-EdgeBox-V-T',                 0,clrs(27,:), '-'
+%     'Fast-EdgeBox-V-T-S',                 0,clrs(28,:), '-'
 };
+% algs = algsList;
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'scuttest'};
+dataNames = {
+    'scuttest'
+    'scuttrain'
+    };
 
 % select databases, experiments and algorithms for evaluation
-dataNames = dataNames(1); % select one or more databases for evaluation
+dataNames = dataNames(2); % select one or more databases for evaluation
 exps = exps(:);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
 aspectRatio = .46;        % default aspect ratio for all bbs
 bnds = [10 10 700 570];     % discard bbs outside this pixel range
+% bnds = [90 40 640 330];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 1000;             % only show best plotNum curves (and VJ and HOG)
+% samples = 10.^(-2:.25:1); % samples for computing area under the curve FPPI=0.
 samples = 10.^(-4:.25:0); % samples for computing area under the curve
 lims = [2e-4 10 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
@@ -146,6 +166,7 @@ for g=1:nGt
     hr = exps(g).hr.*[1/exps(g).filter exps(g).filter]; % expand bbox
     for f=1:n, bb=dt{f}; dt{f}=bb(bb(:,4)>=hr(1) & bb(:,4)<hr(2),:); end
     [gtr,dtr] = bbGt('evalRes',gt,dt,exps(g).overlap);
+%     [gtr,dtr] = bbGt('evalRes',gt,dt,exps(g).overlap,1); % use on EB
     R=struct('stra',stra,'stre',stre,'gtr',{gtr},'dtr',{dtr});
     res(g,d)=R; save(fName,'R');
   end
@@ -211,7 +232,6 @@ for p=1:nPlots
       'XMinorGrid','off','XMinorTic','off',...
       'YMinorGrid','off','YMinorTic','off',...
       'FontSize',9);
-%       'Position',[0.0892561983471074 0.121145374449339 0.890743801652892 0.848854625550661]);
     xlabel('false positives per image','FontSize',9);
     ylabel('miss rate','FontSize',9); axis(lims);
     set(gcf,'color',[1 1 1],'PaperOrientation','landscape','PaperType','<custom>','PaperSize',[10 7.6],'Renderer','painters');
@@ -224,9 +244,6 @@ for p=1:nPlots
   if(~isempty(lgd1)), legend1=legend(h,lgd1,'Location','sw','FontSize',9); end
     %save figure to disk (uncomment pdfcrop commands to automatically crop)
 %      savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
-%   set(legend1,...
-%     'Position',[0.099783388917837 0.134820189049102 0.373256706510678 0.37183369001546],...
-%     'FontSize',12);
   saveas(1,[fName1 '.pdf']); %close(1);
   saveas(1,[fName1 '.fig']);
   %saveas(1,fName1,'pdf');
@@ -458,7 +475,9 @@ for i=1:nAlg
       end
       bbs=load([vName '.txt'],'-ascii');
       for f=frames, bb=bbs(bbs(:,1)==f+1,2:6);
-        bb=bbApply('resize',bb,resize,0,aspectRatio); k=k+1; dt{k}=bb;
+        bb=bbApply('resize',bb,resize,0,aspectRatio); k=k+1; 
+%         dt{k}=bb(1:min(10,size(bb,1)),:); % limit the top N box
+        dt{k}=bb;
       end
     end
   end
