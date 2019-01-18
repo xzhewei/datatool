@@ -1,32 +1,33 @@
-% dt = load('./scut/results/scuttest/dt-e2e-frcnn-VGG16-C5d2-im1.5.mat');
-% gt = load('./scut/results/scuttest/gt-All.mat');
-% R = load('./scut/results/scuttest/ev-All-e2e-frcnn-VGG16-C5d2-im1.5.mat');
-
 function road_valid()
-imgDir = 'E:\Datasets\scut\extract\test25\images\';
-gt = load('E:\Datasets\scut\extract\gt-All-test25.mat');
+imgDir = 'E:\Datasets\caltech\extract\train01\images\';
+gt = load('E:\Datasets\caltech\mat\train01\gt-All.mat');
+output_dir = 'E:\road_line\caltech\train01';
 gt = gt.gt;
-load('E:\Code\Detectron\output\scut\S1_G0-3-S1_e2e_frcnn_VGG16-C5_roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\roadline.mat')
-roadline = double(roadline');
+% load('E:\Code\Detectron\output\scut\S1_G0-3-S1_e2e_frcnn_VGG16-C5_roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\roadline.mat')
+% roadline = double(roadline');
+
+gt_line = center_line(gt);
+% D = center-roadline;
+% D = D(center~=0);
+gt_line(gt_line == 0)=197;
+
+recordAvi(gt, gt_line, [], imgDir, output_dir);
+end
+
+function recordAvi(gt, gt_line, dt_line, imgDir, output_dir)
 imglist = dir([imgDir '*.jpg']);
-center = center_line(gt);
-D = center-roadline;
-D = D(center~=0);
-center(center == 0)=215;
-rec_avi = true;
 [~,name,~] = fileparts(imglist(1).name);
 C = strsplit(name,'_');
-if (rec_avi)
-    sname = 'E:\gt2road_line_test';
-    vidObj = VideoWriter([sname '_' C{1} '_' C{2} '.avi']);
-    % vidObj.CompressionRatio = 1;
-    % vidObj.Height = 512;
-    % vidObj.Width = 640;
-    vidObj.FrameRate = 25;
-    open(vidObj);
-    fprintf('Recording %s %s',C{1},C{2});
-end
-for i=1:numel(center)
+
+sname = fullfile(output_dir, 'road_line');
+vidObj = VideoWriter([sname '_' C{1} '_' C{2} '.avi']);
+% vidObj.CompressionRatio = 1;
+% vidObj.Height = 512;
+% vidObj.Width = 640;
+vidObj.FrameRate = 25;
+open(vidObj);
+fprintf('Recording %s %s',C{1},C{2});
+for i=1:numel(gt_line)
     [~,namet,~] = fileparts(imglist(i).name);
     Ct = strsplit(namet,'_');
     if ~strcmp(Ct{1},C{1}) || ~strcmp(Ct{2},C{2})
@@ -40,13 +41,13 @@ for i=1:numel(center)
     end
     figure(1);
     fimg = fullfile(imgDir,imglist(i).name);
-    drawRoadLine(fimg,center(i),gt{i});
-    line([0 720],[roadline(i) roadline(i)],'Color',[1 0 0],'LineWidth',4);
-    if (rec_avi)
-        currFrame=getframe;
-        writeVideo(vidObj,currFrame);
+    drawRoadLine(fimg,gt_line(i),gt{i});
+    if ~isempty(dt_line)
+        line([0 720],[dt_line(i) dt_line(i)],'Color',[1 0 0],'LineWidth',4);
     end
-    %     saveas(1,fullfile('E:\road_line\test25',imglist(i).name));
+    currFrame=getframe;
+    writeVideo(vidObj,currFrame);
+%     saveas(1,fullfile(fullfile(output_dir,'images'),imglist(i).name));
     %     pause;
 end
 if (rec_avi)
@@ -71,7 +72,7 @@ end
 
 
 
-function init()
+function temp()
 dt = load('./scut/results/scuttest_all/dt-Fast-EdgeBox-V-T-S.mat');
 gt = load('./scut/results/scuttest_all/gt-ROI.mat');
 R = load('./scut/results/scuttest_all/ev-ROI-RPN-vanilla.mat');
