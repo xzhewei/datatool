@@ -1,13 +1,16 @@
 % pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
-pth = 'F:\DataSet\KAIST\';
+% pth = 'E:\Dataset\KAIST\';
+pth = 'E:\Datasets\caltech';
 if (1)
-[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_kaist( pth );
+[allCount,allbboxList,vCount,vbboxList,lCount] = vbbCount_caltech( pth );
 save([pth 'analysis.mat']);
 else
 load([pth 'analysis.mat']);
 end
 
-vhead = {'road','fname','nFrame','lFrame','bbox','uobjs','occl',...
+% vhead = {'road','fname','nFrame','lFrame','bbox','uobjs','occl',...
+%          'frame_per_obj','bbox_per_frame'};
+vhead = {'fname','nFrame','lFrame','bbox','uobjs','occl',...
          'frame_per_obj','bbox_per_frame'};
 fvCount = struct2cell(vCount)';
 fvCount = [vhead; fvCount];

@@ -1,5 +1,5 @@
 function pos_grid = vbbPosition
-pth = 'F:\DataSet\SCUT_FIR_101\datasets\';
+pth = 'E:\Datasets\caltech\';
 if ~exist('allbboxList', 'var')
     load([pth 'analysis.mat']);
 end
@@ -12,14 +12,14 @@ hold(hpaxes,'on');
 h = center_y;
 % Create histogram
 hpdist = histogram(h,'Parent',hpaxes,'Normalization','probability',...
-    'BinEdges',0:5:576);
-% set(hpaxes,'XMinorTick','on','XScale','log','XTick',[0 100 200 300 400 500 576],...
-%     'YGrid','on','XLim',[0 576]);
-% saveas(hpdist,[pth 'Position Distribution'],'png');
+    'BinEdges',0:5:480);
+set(hpaxes,'XMinorTick','on','XTick',[0 100 200 300 400 480],...
+    'YGrid','on','XLim',[0 480]);
+saveas(hpdist,[pth 'Position Distribution'],'png');
 
 [N,~] = histcounts(h,'Normalization','probability',...
-                   'BinEdges',[0 166 266 576]);
-file = fopen([pth 'poslog.txt'],'w');
+                   'BinEdges',[0 147 257 480]);
+file = fopen(fullfile(pth,'poslog.txt'),'w');
 fprintf(file,['Position Distribution\n']);
 fprintf(file,[repmat('-',1,76) '\n']);
 fprintf(file,'Min : %.2f\n', min(h));
@@ -29,12 +29,13 @@ fprintf(file,'Math Average : %.2f\n', sum(h)/length(h));
 fprintf(file,'Log-Average : %.2f\n', exp(sum(log(h))/length(h)));
 fprintf(file,[repmat('-',1,76) '\n']);
 fprintf(file,'Position range:\n');
-fprintf(file,'0-160:            %.2f%% \n', N(1)*100);
-fprintf(file,'160-260:          %.2f%% \n', N(2)*100);
-fprintf(file,'260-576:          %.2f%% \n', N(3)*100);
+fprintf(file,'0-147:            %.2f%% \n', N(1)*100);
+fprintf(file,'147-257:          %.2f%% \n', N(2)*100);
+fprintf(file,'257-480:          %.2f%% \n', N(3)*100);
+fclose(file);
 %%
-pos_grid = zeros(576,720);
-
+figure();
+pos_grid = zeros(500,660);
 for i=1:numel(center_x)
     x = round(center_x(i));
     y = round(center_y(i));
@@ -49,4 +50,4 @@ lg_K3 = log(K3);
 fig = figure();
 imagesc(lg_K3);
 colormap('jet');
-% saveas(fig,[pth 'Position Distribution Heatmap'],'png');
+saveas(fig,fullfile(pth,'Position Distribution Heatmap'),'png');

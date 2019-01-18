@@ -9,7 +9,7 @@ vbbNum = numel([vidIds{:}]);
 % 单一视频统计信息
 vhead = {'fname','nFrame','lFrame','bbox','uobjs','occl',...
          'frame_per_obj','bbox_per_frame'};
-vCount=cell(vbbNum,numel(vhead)-1);
+vCount=cell(vbbNum,numel(vhead));
 
 % 每条bbox的信息
 bhead = {'filename','frame','id','label','pos_x','pos_y','pos_w','pos_h',...
@@ -19,7 +19,7 @@ allbboxList = {};
 
 % 每个视频bbox的信息
 vbhead = {'fName','bboxList'};
-vbboxList=cell(vbbNum,numel(vbhead)-1);
+vbboxList=cell(vbbNum,numel(vbhead));
 
 % 每个类别的统计信息
 lhead = {'fname','label','nFrame','lFrame','bbox','uobjs','occl',...
@@ -31,7 +31,7 @@ for s=1:length(setIds)
   for v=1:length(vidIds{s})
     % load ground truth
     name=sprintf('set%02d/V%03d',setIds(s),vidIds{s}(v));
-    A=vbb('vbbLoadTxt',[pth '/annotations/' name]);
+    A=vbb('vbbLoad',[pth '/annotations/' name]);
       
 % for i = 1:length(txtNameList)
 %     fNameTxt = [path, txtNameList(i).name];                                % 原始的 txt 文件所在的路径+名称
@@ -49,7 +49,7 @@ for s=1:length(setIds)
        for k = 1:frames_bNum(j)
            obj = A.objLists{j}(k);
            bboxList(n,:) = {j,obj.id, A.objLbl(obj.id), obj.pos,...
-                    obj.posv, obj.occl, obj.pos(3)/obj.pos(4), ...
+                    obj.posv, int32(obj.occl), obj.pos(3)/obj.pos(4), ...
                     [obj.pos(1)+obj.pos(3)/2, obj.pos(2)+obj.pos(4)/2]};
            n = n + 1;
        end
@@ -66,15 +66,27 @@ for s=1:length(setIds)
     label = bboxList(:,3);
     pos   = bboxList(:,4);
     pos   = cell2mat(pos);
-    pos   = mat2cell(pos,ones(bboxNum,1),ones(4,1));
+    if ~isempty(pos)
+        pos   = mat2cell(pos,ones(bboxNum,1),ones(4,1));
+    else
+        pos = cell(1,4);
+    end
     posv  = bboxList(:,5);
     posv  = cell2mat(posv);
-    posv  = mat2cell(posv,ones(bboxNum,1),ones(4,1));
+    if ~isempty(posv)
+        posv  = mat2cell(posv,ones(bboxNum,1),ones(4,1));
+    else
+        posv = cell(1,4);
+    end
     occl  = bboxList(:,6);
     ratio = bboxList(:,7);
     center= bboxList(:,8);
     center= cell2mat(center);
-    center= mat2cell(center,ones(bboxNum,1),ones(2,1));
+    if ~isempty(center)
+        center= mat2cell(center,ones(bboxNum,1),ones(2,1));
+    else
+        center = cell(1,2);
+    end
     xbboxList = [cfName,frame,id,label,pos,center,occl,ratio,posv];
     
     % 每个视频信息统计
@@ -97,7 +109,8 @@ for s=1:length(setIds)
     A.person    = label_count(A,'person');                      % 行人统计
     A.people    = label_count(A,'people');                      % 人群统计
     A.person_m  = label_count(A,'person?');                     % 疑似行人
-    A.cyclist   = label_count(A,'cyclist');                     % 骑车人统计
+    A.personfa  = label_count(A,'person-fa');                   % 远距离
+    A.ignore    = label_count(A,'ignore');                      % 忽略
     
     if(0)
         validLabel(A);
@@ -105,21 +118,24 @@ for s=1:length(setIds)
     
     % 将结构体展开成cell，并添加标签信息
     person    = label2cell(A.person,'person');
-    cyclist   = label2cell(A.cyclist,'cyclist');
+    personfa   = label2cell(A.personfa,'person-fa');
     people    = label2cell(A.people,'people');
     person_m  = label2cell(A.person_m,'person?');
+    ignore = label2cell(A.ignore, 'ignore');
     
     % 添加视频文件名
     person    = [A.fileName,person];    
-    cyclist   = [A.fileName,cyclist];    
+    personfa   = [A.fileName,personfa];    
     people    = [A.fileName,people];    
-    person_m  = [A.fileName,person_m];    
+    person_m  = [A.fileName,person_m];
+    ignore = [A.fileName, ignore];
     
     % 每个视频每个标签类别统计信息存储在lCount中
-    lCount((i-1)*4+1:i*4,:) = [person;
-                               cyclist;
+    lCount((i-1)*5+1:i*5,:) = [person;
+                               personfa;
                                people;
-                               person_m;];
+                               person_m;
+                               ignore;];
     
     % 将每个视频的bboxList存储起来
     tvCount={fName,A.bboxList};
@@ -132,9 +148,9 @@ for s=1:length(setIds)
 end
 % 将cell转换为struct方便查看
 lCount = cell2struct(lCount',lhead);
-vbboxList = [road,vbboxList];
+vbboxList = [vbboxList];
 vbboxList = cell2struct(vbboxList',vbhead);
-vCount = [road,vCount];
+vCount = [vCount];
 vCount = cell2struct(vCount',vhead);
 allbboxList = cell2struct(allbboxList',bhead);
 
@@ -145,16 +161,18 @@ allCount = cell(7,numel(allhead));
 % 整个数据集的所有类别的统计信息
 all             = all_count(vCount);
 all_person      = all_label_count(lCount,'person');
-all_cyclist     = all_label_count(lCount,'cyclist');
+all_personfa     = all_label_count(lCount,'person-fa');
 all_people      = all_label_count(lCount,'people');
 all_person_m    = all_label_count(lCount,'person?');
+all_ignore = all_label_count(lCount,'ignore');
 
 % 存储在allCount
 allCount(1,:) = label2cell(all,'all');
 allCount(2,:) = label2cell(all_person,'person');
-allCount(3,:) = label2cell(all_cyclist,'cyclist');
+allCount(3,:) = label2cell(all_personfa,'person-fa');
 allCount(4,:) = label2cell(all_people,'people');
 allCount(5,:) = label2cell(all_person_m,'person?');
+allCount(6,:) = label2cell(all_ignore,'ignore');
 allCount = cell2struct(allCount',allhead);
 
 % 统计宽度分布
@@ -207,9 +225,10 @@ end
 function flag = validLabel(A)
 % 验证标注文件中标签是否有错误
     flag = strcmp(A.objLbl,'person');
-    flag = flag | strcmp(A.objLbl,'cyclist');
+    flag = flag | strcmp(A.objLbl,'person-fa');
     flag = flag | strcmp(A.objLbl,'people');
-    flag = flag | strcmp(A.objLbl,'person?');  
+    flag = flag | strcmp(A.objLbl,'person?');
+    flag = flag | strcmp(A.objLbl,'ignore');
     disp(['filename:' A.fileName ' error:' num2str(find(~flag))]);
 end
 
