@@ -4,7 +4,11 @@ function center = center_line(gt)
         if isempty(gt{i})
             continue;
         end
+        if sum(gt{i}(:,5)~=-1)==0
+            continue;
+        end
         pos = rcwh2xywh(gt{i}(:,1:4));
-        center(i) = mean(pos(:,2));
+        index = gt{i}(:,5)~=-1;
+        center(i) = mean(pos(index,2));
     end
 end
