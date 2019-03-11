@@ -41,7 +41,7 @@ for s=1:length(setIds)
     ticId = ticStatus(['Extract set' num2str(setIds(s)) ':'],0.2,1);
   for v=1:length(vidIds{s})
     % load ground truth
-    name=sprintf('set%02d/V%03d',setIds(s),vidIds{s}(v));
+    name=sprintf('set%02d/%s_V%03d',setIds(s),upper(type),vidIds{s}(v));
     n = numel(dir([pth '/annotations/' name]))-2;
     if(flatten), post=''; else post=[name '/']; end
     if(flatten), f=[name '_']; f(6)='_'; else f=''; end
