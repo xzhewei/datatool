@@ -1,5 +1,5 @@
 function pos_grid = vbbPosition
-pth = 'E:\Datasets\caltech\';
+pth = 'E:\Datasets\scut\summary\';
 if ~exist('allbboxList', 'var')
     load([pth 'analysis.mat']);
 end
@@ -12,13 +12,13 @@ hold(hpaxes,'on');
 h = center_y;
 % Create histogram
 hpdist = histogram(h,'Parent',hpaxes,'Normalization','probability',...
-    'BinEdges',0:5:480);
-set(hpaxes,'XMinorTick','on','XTick',[0 100 200 300 400 480],...
-    'YGrid','on','XLim',[0 480]);
-saveas(hpdist,[pth 'Position Distribution'],'png');
+    'BinEdges',0:5:576);
+set(hpaxes,'XMinorTick','on','XTick',[0 100 200 300 400 500 576],...
+    'YGrid','on','XLim',[0 576]);
+% saveas(hpdist,fullfile(pth,'Position_Distribution.png'));
 
 [N,~] = histcounts(h,'Normalization','probability',...
-                   'BinEdges',[0 147 257 480]);
+                   'BinEdges',[0 166 266 576]);
 file = fopen(fullfile(pth,'poslog.txt'),'w');
 fprintf(file,['Position Distribution\n']);
 fprintf(file,[repmat('-',1,76) '\n']);
@@ -29,13 +29,13 @@ fprintf(file,'Math Average : %.2f\n', sum(h)/length(h));
 fprintf(file,'Log-Average : %.2f\n', exp(sum(log(h))/length(h)));
 fprintf(file,[repmat('-',1,76) '\n']);
 fprintf(file,'Position range:\n');
-fprintf(file,'0-147:            %.2f%% \n', N(1)*100);
-fprintf(file,'147-257:          %.2f%% \n', N(2)*100);
-fprintf(file,'257-480:          %.2f%% \n', N(3)*100);
+fprintf(file,'0-166:            %.2f%% \n', N(1)*100);
+fprintf(file,'166-266:          %.2f%% \n', N(2)*100);
+fprintf(file,'266-576:          %.2f%% \n', N(3)*100);
 fclose(file);
 %%
 figure();
-pos_grid = zeros(500,660);
+pos_grid = zeros(576,720);
 for i=1:numel(center_x)
     x = round(center_x(i));
     y = round(center_y(i));
