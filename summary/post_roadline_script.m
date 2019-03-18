@@ -1,8 +1,8 @@
-function post_roadline_script
+function [mr,D,A,B] = post_roadline_script
 % get results
 % R = load('./scut/results/scuttest/ev-All-FRCN-vanilla.mat');
-R = load('E:\Code\Detectron\output\scut\S1_G0-3-S1_e2e_frcnn_VGG16-C5_roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\scut_eval\scuttest\ev-All-e2e-frcnn-VGG16-C5.mat');
-load('E:\Code\Detectron\output\scut\S1_G0-3-S1_e2e_frcnn_VGG16-C5_roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\roadline.mat')
+R = load('E:\Work\Work_scut\ï¿½ï¿½ï¿½ï¿½\05.ROI\exp\caltech\S1-G0-7-frcnn_VGG16_C4\detectron-output\test\caltech_test_1x\generalized_rcnn\caltech_eval\UsaTest\ev-All-frcnn_VGG16_C4.mat');
+load('E:\Work\Work_scut\ï¿½ï¿½ï¿½ï¿½\05.ROI\exp\caltech\S1-G1-7-frcnn_VGG16_C4-roadline\detectron-output\test\caltech_test_1x_roadline\generalized_rcnn\roadline.mat')
 center = double(roadline');
 gtr = R.R.gtr;
 dtr = R.R.dtr;
@@ -22,9 +22,9 @@ end
 
 function todo()
 % post_roadline
-nD = 9310; % Â·ÃæÏµÊý
-nA = 2.7; % Â·ÃæË¥¼õÏµÊý
-nB = 1; % µÃ·ÖË¥¼õÏµÊý
+nD = 9310; % Â·ï¿½ï¿½Ïµï¿½ï¿½
+nA = 2.7; % Â·ï¿½ï¿½Ë¥ï¿½ï¿½Ïµï¿½ï¿½
+nB = 1; % ï¿½Ã·ï¿½Ë¥ï¿½ï¿½Ïµï¿½ï¿½
 roadline = 215;
 scores = 0:0.1:1;
 yp = 0:10:576;
@@ -82,9 +82,9 @@ end
 
 function [mr,D,A,B] = findparam(dtr,gtr,center,nD,nA,nB,type)
     % post_roadline
-%     nD = 400:10:800; % Â·ÃæÏµÊý
-%     nA = 2:0.1:5; % Â·ÃæË¥¼õÏµÊý
-%     nB = 1:0.1:1; % µÃ·ÖË¥¼õÏµÊý
+%     nD = 400:10:800; % Â·ï¿½ï¿½Ïµï¿½ï¿½
+%     nA = 2:0.1:5; % Â·ï¿½ï¿½Ë¥ï¿½ï¿½Ïµï¿½ï¿½
+%     nB = 1:0.1:1; % ï¿½Ã·ï¿½Ë¥ï¿½ï¿½Ïµï¿½ï¿½
 plotRoc = 1;
 samplesMR2 = 10.^(-2:.25:0); % samples for computing area under the curve FPPI=0.
 % samplesMR4 = 10.^(-4:.25:0); % samples for computing area under the curve
@@ -103,7 +103,7 @@ for i = 1:ND
                 end
                 %     dtr_rd{i} = dtr{i};
                 dtr_rd{l} = [rcwh2xywh(dtr{l}(:,1:4)), dtr{l}(:,5:end)];
-                dtr_rd{l}(:,5) = max(0,post_roadline(type,dtr_rd{l}(:,5),dtr_rd{l}(:,2),center(i),nD(i),nA(j),nB(k)));
+                dtr_rd{l}(:,5) = max(0.5,post_roadline(type,dtr_rd{l}(:,5),dtr_rd{l}(:,2),center(l),nD(i),nA(j),nB(k)));
             end
             [xs_re,ys_re,~,mr_re] = bbGt('compRoc',gtr,dtr_rd,plotRoc,samplesMR2);
             if(plotRoc), ys_re=1-ys_re; mr_re=1-mr_re; end
