@@ -1,7 +1,7 @@
 function road_valid()
-imgDir = 'E:\Datasets\caltech\extract\train01\images\';
-gt = load('E:\Datasets\caltech\mat\train01\gt-All.mat');
-output_dir = 'E:\road_line\caltech\train01';
+imgDir = 'E:\Datasets\scut\extract\test25\images\';
+gt = load('E:\Datasets\scut\mat\test25\gt-All.mat');
+output_dir = 'E:\road_line\scut\test25_gt_box';
 gt = gt.gt;
 % load('E:\Code\Detectron\output\scut\S1_G0-3-S1_e2e_frcnn_VGG16-C5_roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\roadline.mat')
 % roadline = double(roadline');
@@ -9,9 +9,34 @@ gt = gt.gt;
 gt_line = center_line(gt);
 % D = center-roadline;
 % D = D(center~=0);
-gt_line(gt_line == 0)=197;
+gt_line(gt_line == 0)=216;
+draw_ground_plane_lines(gt, gt_line, [], imgDir, output_dir)
+% recordAvi(gt, gt_line, [], imgDir, output_dir);
+end
 
-recordAvi(gt, gt_line, [], imgDir, output_dir);
+function draw_ground_plane_lines(gt, gt_line, dt_line, imgDir, output_dir)
+imglist = dir([imgDir '*.jpg']);
+[~,name,~] = fileparts(imglist(1).name);
+C = strsplit(name,'_');
+fprintf('Drawing %s %s',C{1},C{2});
+for i=1:numel(gt_line)
+    [~,namet,~] = fileparts(imglist(i).name);
+    Ct = strsplit(namet,'_');
+    if ~strcmp(Ct{1},C{1}) || ~strcmp(Ct{2},C{2})
+        fprintf('Drawing %s %s',C{1},C{2});
+    end
+    figure(1);
+    fimg = fullfile(imgDir,imglist(i).name);
+    if isempty(gt)
+        drawRoadLine(fimg,gt_line(i),{});
+    else
+        drawRoadLine(fimg,gt_line(i),gt{i});
+    end
+    if ~isempty(dt_line)
+        line([0 720],[dt_line(i) dt_line(i)],'Color',[1 0 0],'LineWidth',4);
+    end
+    saveas(1,fullfile(fullfile(output_dir,'images'),imglist(i).name));
+end
 end
 
 function recordAvi(gt, gt_line, dt_line, imgDir, output_dir)
@@ -41,13 +66,17 @@ for i=1:numel(gt_line)
     end
     figure(1);
     fimg = fullfile(imgDir,imglist(i).name);
-    drawRoadLine(fimg,gt_line(i),gt{i});
+    if isempty(gt)
+        drawRoadLine(fimg,gt_line(i),{});
+    else
+        drawRoadLine(fimg,gt_line(i),gt{i});
+    end
     if ~isempty(dt_line)
         line([0 720],[dt_line(i) dt_line(i)],'Color',[1 0 0],'LineWidth',4);
     end
     currFrame=getframe;
     writeVideo(vidObj,currFrame);
-%     saveas(1,fullfile(fullfile(output_dir,'images'),imglist(i).name));
+    saveas(1,fullfile(fullfile(output_dir,'images'),imglist(i).name));
     %     pause;
 end
 if (rec_avi)
