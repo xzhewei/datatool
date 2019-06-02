@@ -1,5 +1,5 @@
 function extractCropImgs(fname,seqDir,annDir)
-%     fname = '20131206-173911';
+% Extract bbox image from seq file by annotation file.
     A = vbb('vbbLoad',[annDir '/' fname '.txt']);
     Is = seqIo([seqDir '/' fname '.seq'],'toImgs');
     for i = 1:A.maxObj
