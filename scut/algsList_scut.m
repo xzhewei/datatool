@@ -1,4 +1,4 @@
-function algs = algsList
+function algs = algsList_scut
 n=1000; clrs=zeros(n,3);
 for i=1:n, clrs(i,:)=max(.3,mod([78 121 42]*(i+1),255)/255); end
 algs_dataset_R1= {  
@@ -22,5 +22,16 @@ algs_temp = {
   'e2e-frcnn-VGG16-C5d2-im1.5'            0, clrs(9,:),   '-'
   'scut_4s_480_20k_test_ped',            0, clrs(10,:),  '--'
 };
-algs = algs_temp;
+algs_ROI_paper = {
+  'ACF-T-THOG',        0, clrs(6,:),   '-'
+  'YOLOv2',     0, clrs(9,:),   '--'
+  'YOLOv3',     0, clrs(8,:),   '-'
+%   'GPCAnet',    0, clrs(9,:),   '-'
+  'MS-CNN',     0, clrs(10,:),   '--'
+  'RPN+BF',     0, clrs(11,:),  '-'
+  'FasterR-CNN',0, clrs(7,:),  '--'
+  'GPCAnet-filter', 0, clrs(12,:),  '-'
+%   'FasterR-CNN-filter',0, clrs(14,:),  '-'
+};
+algs = algs_ROI_paper;
 end
