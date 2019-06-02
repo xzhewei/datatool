@@ -1,5 +1,6 @@
 function vbbHist
-pth = 'F:\DataSet\KAIST\';
+% pth = 'F:\DataSet\KAIST\';
+pth = 'E:\Datasets\caltech\summary\';
 if ~exist('allbboxList', 'var')
     load([pth 'analysis.mat']);
 end
@@ -18,7 +19,8 @@ end
     
 h = [allbboxList(index).pos_h];
 h = sort(h);
-kp = round(h(1:round(numel(h)/10):end));
+h_f=h(1,h>=20);
+kp = round(h_f(1:round(numel(h_f)/5):end));
 hmin = min(h);
 hmax = max(h);
 % log equal divid XTick
