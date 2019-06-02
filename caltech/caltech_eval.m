@@ -26,7 +26,7 @@ exps = {
   'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 };
 exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 
-dataNames = {'UsaTest'};
+dataNames = {'UsaTest','UsaTest_new'};
 
 % remaining parameters and constants
 aspectRatio = .41;        % default aspect ratio for all bbs
@@ -52,22 +52,29 @@ end
 
 for d=1:length(dataNames), dataName=dataNames{d};
 dbInfo(dataName);
-output_dir = [output_dir '/' dataName];
-if (~exist(output_dir,'dir')), mkdir(output_dir); end
+output_dir2 = [output_dir '/' dataName];
+if (~exist(output_dir2,'dir')), mkdir(output_dir2); end
+
+plotName=[fileparts(mfilename('fullpath')) '/results/' dataName];
+if(~exist(plotName,'dir')), mkdir(plotName); end
 
 % load detections and ground truth and evaluate
-dts = loadDt( algs, res_dir, output_dir, aspectRatio );
-gts = loadGt( exps, output_dir, aspectRatio, bnds );
-res = evalAlgs( output_dir, algs, exps, gts, dts );
+dts = loadDt( algs, res_dir, output_dir2, aspectRatio );
+if strcmp(dataName,'UsaTest_new')
+    gts = loadGt_new( exps, plotName, aspectRatio, bnds );
+else
+    gts = loadGt( exps, output_dir2, aspectRatio, bnds );
+end
+res = evalAlgs( output_dir2, algs, exps, gts, dts );
 
 % plot curves and bbs
 fprintf('MR-2 (FPPI in [%e,%e])\n',samplesMR2(1),samplesMR2(end));
-plotExps( res, plotRoc, plotAlg, plotNum, [output_dir '-MR2'], ...
+plotExps( res, plotRoc, plotAlg, plotNum, [output_dir2 '-MR2'], ...
   samplesMR2, lims, reshape([algs.color]',3,[])', {algs.style} );
 fprintf('MR-4 (FPPI in [%e,%e])\n',samplesMR4(1),samplesMR4(end));
-plotExps( res, plotRoc, plotAlg, plotNum, [output_dir '-MR4'], ...
+plotExps( res, plotRoc, plotAlg, plotNum, [output_dir2 '-MR4'], ...
   samplesMR4, lims, reshape([algs.color]',3,[])', {algs.style} );
-plotBbs( res, output_dir, bbsShow, bbsType );
+plotBbs( res, output_dir2, bbsShow, bbsType );
 
 end
 end
@@ -338,6 +345,33 @@ end
   end
 end
 
+function gts = loadGt_new( exps, plotName, aspectRatio, bnds )
+  persistent pth; pth1=dbInfo;
+  if(~strcmp(pth,pth1)), pth=dbInfo; end
+  fprintf('Loading ground truth: %s\n',plotName);
+  nExp=length(exps); gts=cell(1,nExp);
+  for i=1:nExp
+    gName = [plotName '/gt-new-' exps(i).name '.mat'];
+    if(exist(gName,'file')), gt=load(gName); gts{i}=gt.gt; continue; end
+    fprintf('\tExperiment #%d: %s\n', i, exps(i).name);
+    if (exps(i).ar~=0) 
+        ar=exps(i).ar; 
+        arRng=[-ar/sign(ar)+aspectRatio,ar/sign(ar)+aspectRatio];
+    else
+        arRng=[];
+    end
+    pLoad = {'lbls',{'person','person?','people','ignore'},...
+           'hRng',exps(i).hr,'vRng',exps(i).vr,'arRng', arRng,...
+           'xRng',[bnds(1) bnds(3)],'yRng',[bnds(2) bnds(4)]};
+    [gt,~] = bbGt('loadAll',[pth '\Caltech_new_annotations\test_1x_new'],{},pLoad);
+    for k=1:length(gt)
+      bb = gt{k}; ids = bb(:,5)~=1;
+      bb(ids,:)=bbApply('resize',bb(ids,:),1,0,aspectRatio);
+      gt{k} = bb;
+    end
+    gts{i}=gt; save(gName,'gt','-v6');
+  end  
+end
 
 function dts = loadDt( algs, res_dir, output_dir, aspectRatio )
 % Load detections of all algorithm for all frames.

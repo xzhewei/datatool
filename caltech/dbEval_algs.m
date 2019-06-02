@@ -1,18 +1,19 @@
 function dbEval_algs
 
 addpath(genpath('../toolbox'));
+rmpath(genpath('../toolbox/external/other'));
 % remove all the former results
 DIRS=dir('results');
-n=length(DIRS);
-for i=1:n
-    if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
-        if (DIRS(i).isdir)
-            rmdir(fullfile('results',DIRS(i).name),'s');
-        else
-            delete(fullfile('results',DIRS(i).name));
-        end
-    end
-end
+% n=length(DIRS);
+% for i=1:n
+%     if ~strcmp(DIRS(i).name,'.') && ~strcmp(DIRS(i).name,'..')
+%         if (DIRS(i).isdir)
+%             rmdir(fullfile('results',DIRS(i).name),'s');
+%         else
+%             delete(fullfile('results',DIRS(i).name));
+%         end
+%     end
+% end
 
 % Evaluate and plot all pedestrian detection results.
 %
@@ -73,7 +74,7 @@ algs = alglist();
 algs=cell2struct(algs',{'name','resize','color','style'});
 
 % List of database names
-dataNames = {'UsaTest','UsaTrain','InriaTest',...
+dataNames = {'UsaTest','UsaTest_new','UsaTrain','InriaTest',...
   'TudBrussels','ETH','Daimler','Japan'};
 
 % select databases, experiments and algorithms for evaluation
@@ -85,10 +86,10 @@ algs = algs(:);           % select one or more algorithms for evaluation
 aspectRatio = .41;        % default aspect ratio for all bbs
 bnds = [5 5 635 475];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
-plotAlg = 0;              % if true one plot per alg else one plot per exp
+plotAlg = 1;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
-lims = [2e-4 50 .035 1];  % axis limits for ROC plots
+lims = [2e-4 10 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 
@@ -114,7 +115,11 @@ for d=1:length(dataNames), dataName=dataNames{d};
   
   % load detections and ground truth and evaluate
   dts = loadDt( algs, plotName, aspectRatio );
-  gts = loadGt( exps, plotName, aspectRatio, bnds );
+  if strcmp(dataName,'UsaTest_new')
+    gts = loadGt_new( exps, plotName, aspectRatio, bnds );
+  else
+    gts = loadGt( exps, plotName, aspectRatio, bnds );
+  end
   res = evalAlgs( plotName, algs, exps, gts, dts );
   
   % plot curves and bbs
@@ -214,15 +219,17 @@ for p=1:nPlots
       'YMinorGrid','off','YMinorTic','off');
     xlabel('false positives per image','FontSize',14);
     ylabel('miss rate','FontSize',14); axis(lims);
+    set(gcf,'color',[1 1 1],'PaperType','<custom>','PaperSize',[10 7.6],'Renderer','painters');
   else
     x=1; for i=1:n, x=max(x,max(xs1{i})); end, x=min(x-mod(x,.1),1.0);
     y=.8; for i=1:n, y=min(y,min(ys1{i})); end, y=max(y-mod(y,.1),.01);
     xlim([0, x]); ylim([y, 1]); set(gca,'xtick',0:.1:1);
     xlabel('Recall','FontSize',14); ylabel('Precision','FontSize',14);
   end
-  if(~isempty(lgd1)), legend(h,lgd1,'Location','sw','FontSize',11); end
+  if(~isempty(lgd1)), legend(h,lgd1,'Location','sw','FontSize',9); end
   % save figure to disk (uncomment pdfcrop commands to automatically crop)
-  savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
+  saveas(1,[fName1 '.fig']);
+%   savefig(fName1,1,'pdf','-r300','-fonts'); %close(1);
   if(0), setenv('PATH',[getenv('PATH') ':/usr/texbin/']); end
   if(0), system(['pdfcrop -margins ''-30 -20 -50 -10 '' ' ...
       fName1 '.pdf ' fName1 '.pdf']); end
@@ -388,6 +395,34 @@ end
     p = p & bb(1)>=bnds(1) & (bb(1)+bb(3)<=bnds(3));
     p = p & bb(2)>=bnds(2) & (bb(2)+bb(4)<=bnds(4));
   end
+end
+
+function gts = loadGt_new( exps, plotName, aspectRatio, bnds )
+  persistent pth; pth1=dbInfo;
+  if(~strcmp(pth,pth1)), pth=dbInfo; end
+  fprintf('Loading ground truth: %s\n',plotName);
+  nExp=length(exps); gts=cell(1,nExp);
+  for i=1:nExp
+    gName = [plotName '/gt-new-' exps(i).name '.mat'];
+    if(exist(gName,'file')), gt=load(gName); gts{i}=gt.gt; continue; end
+    fprintf('\tExperiment #%d: %s\n', i, exps(i).name);
+    if (exps(i).ar~=0) 
+        ar=exps(i).ar; 
+        arRng=[-ar/sign(ar)+aspectRatio,ar/sign(ar)+aspectRatio];
+    else
+        arRng=[];
+    end
+    pLoad = {'lbls',{'person','person?','people','ignore'},...
+           'hRng',exps(i).hr,'vRng',exps(i).vr,'arRng', arRng,...
+           'xRng',[bnds(1) bnds(3)],'yRng',[bnds(2) bnds(4)]};
+    [gt,~] = bbGt('loadAll',[pth '\Caltech_new_annotations\test_1x_new'],{},pLoad);
+    for k=1:length(gt)
+      bb = gt{k}; ids = bb(:,5)~=1;
+      bb(ids,:)=bbApply('resize',bb(ids,:),1,0,aspectRatio);
+      gt{k} = bb;
+    end
+    gts{i}=gt; save(gName,'gt','-v6');
+  end  
 end
 
 function dts = loadDt( algs, plotName, aspectRatio )

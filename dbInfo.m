@@ -65,6 +65,11 @@ switch name1
     setIds=0; subdir='Daimler'; skip=1; ext='png'; vidIds={0};
   case 'pietro'
     setIds=0; subdir='Pietro'; skip=1; ext='jpg'; vidIds={0};
+  
+  % Caltech New annotation
+  case 'usatest_new' % Caltech Pedestrian Datasets (testing)
+    setIds=6:10; subdir='USA'; skip=30; ext='jpg';
+    vidIds={0:18 0:11 0:10 0:11 0:11};
     
   %SCUT FIR Pedestrian Datasets 101
   case 'scut'
