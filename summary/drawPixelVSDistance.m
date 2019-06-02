@@ -5,7 +5,7 @@ H_scut = 1.7;   % person high meter
 f_scut = 576/2/tan(pi*21/2/180); %1553.909; % focus length (pixel)
 lgd={};
 
-h_scut = H.*f_scut./d;
+h_scut = H_scut.*f_scut./d;
 fig = figure();
 axes1 = axes('Parent',fig);
 hold(axes1,'on');
@@ -16,14 +16,14 @@ lgd{1} = 'SCUT';
 % for caltech
 f_caltech = 480/2/tan(pi*27/2/180); %1000
 H_caltech = 1.8;
-h_kaist = H_caltech.*f_caltech./d;
+h_caltech = H_caltech.*f_caltech./d;
 
-p(2) = plot(d,h_kaist,'g');
+p(2) = plot(d,h_caltech,'g');
 lgd{2} = 'Caltech';
 
 % for kaist
 f_kaist = 2*256/2/tan(pi*39/2/180); %772.9217
-h_kaist = H.*f_kaist./d;
+h_kaist = H_scut.*f_kaist./d;
 
 p(3) = plot(d,h_kaist,'r');
 lgd{3} = 'KAIST';
