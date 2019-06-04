@@ -2,9 +2,6 @@ function caltech_eval(res_dir, output_dir, alg_name)
 % Copyright (c) 2018, Zhewei Xu
 % [xzhewei-at-gmail.com]
 % Licensed under The MIT License [see LICENSE for details]
-
-addpath(genpath('toolbox'));
-
 exps = {
   'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
   'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
@@ -292,7 +289,11 @@ for g=1:nGt
     if(exist(fName,'file')), R=load(fName); res(g,d)=R.R; continue; end
     fprintf('\tExp %i/%i, Alg %i/%i: %s/%s\n',g,nGt,d,nDt,stre,stra);
     hr = exps(g).hr.*[1/exps(g).filter exps(g).filter];
-    for f=1:n, bb=dt{f}; dt{f}=bb(bb(:,4)>=hr(1) & bb(:,4)<hr(2),:); end
+    for f=1:n, 
+        if (size(dt{f},1)>0)
+            bb=dt{f}; dt{f}=bb(bb(:,4)>=hr(1) & bb(:,4)<hr(2),:); 
+        end
+    end
     [gtr,dtr] = bbGt('evalRes',gt,dt,exps(g).overlap);
     R=struct('stra',stra,'stre',stre,'gtr',{gtr},'dtr',{dtr});
     res(g,d)=R; save(fName,'R');
@@ -402,8 +403,13 @@ for i=1:nAlg
         bbs=cell2mat(bbs); dlmwrite([vName '.txt'],bbs); rmdir(vName,'s');
       end
       bbs=load([vName '.txt'],'-ascii');
-      for f=frames, bb=bbs(bbs(:,1)==f+1,2:6);
-        bb=bbApply('resize',bb,resize,0,aspectRatio); k=k+1; dt{k}=bb;
+      for f=frames, 
+        if(size(bbs,1)==0)
+            k=k+1;
+        else
+            bb=bbs(bbs(:,1)==f+1,2:6);
+            bb=bbApply('resize',bb,resize,0,aspectRatio); k=k+1; dt{k}=bb;
+        end
       end
     end
   end
