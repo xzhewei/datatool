@@ -1,12 +1,12 @@
-% ï¿½ï¿½roiÍ¼
-% ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+% GRPN¹ýÂËRoI¶Ô±È
+% ·Ö±ð»æÖÆÔ­Í¼£¬RPNµÄROIÍ¼£¬GPRNµÄROIÍ¼
 function paper_draw_roi_and_filter_roi
 % SCUT
 % set='scut';
 % s=15;
 % v=5;
 % f=2074;
-% nf=1634; % ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ÐµÚ¼ï¿½ï¿½ï¿½Í¼
+% nf=1634; % ×Ó¼¯ÖÐµÄµÚ¼¸ÕÅÍ¼
 % path1 = 'E:\Code\maskrcnn-benchmark\output\scut\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice\scut_test_1x_roadline\predictions.mat';
 % path2 = 'E:\Code\maskrcnn-benchmark\output\scut\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice\scut_test_1x_roadline\gpc.mat';
 % p_text=550;
@@ -16,12 +16,15 @@ set='usa';
 s=6;
 v=6;
 f=239;
-nf=370; % ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ÐµÚ¼ï¿½ï¿½ï¿½Í¼
-path1 = 'E:\Code\maskrcnn-benchmark\output\caltech\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice-prop\caltech_test_1x_roadline\predictions.mat';
-path2 = 'E:\Code\maskrcnn-benchmark\output\caltech\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice-prop\caltech_test_1x_roadline\gpc.mat';
+nf=370; % ×Ó¼¯ÖÐµÄµÚ¼¸ÕÅÍ¼
+% path1 = 'E:\Code\maskrcnn-benchmark\output\caltech\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice-prop\caltech_test_1x_roadline\predictions.mat';
+path2 = 'E:\Code\maskrcnn-benchmark\output\caltech\exp\190411-S1-G1-8-e2e_frcnn_VGG_16_C4_gpn_8_gpu-Area\inference-noslice-prop\caltech_test_1x_roadline\gpc.mat';
 p_text=450;
 
+path1 = 'E:\Datasets\caltech\mat\test30\gt-All.mat';
+
 draw(set,s,v,f,nf,path1,path2,p_text)
+
 
 
 
@@ -35,8 +38,8 @@ scale=1;
 
 bbox = all_boxes{nf}*scale;
 bbox = bbox(:,1:4);
-bbox(:,3) = bbox(:,3) - bbox(:,1);
-bbox(:,4) = bbox(:,4) - bbox(:,2);
+% bbox(:,3) = bbox(:,3) - bbox(:,1);
+% bbox(:,4) = bbox(:,4) - bbox(:,2);
 gpc = all_gpcs(nf,:);
 top = gpc(2);
 bottom = gpc(3);

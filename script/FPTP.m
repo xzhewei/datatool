@@ -1,18 +1,11 @@
 function fptp
-caltech = 'E:\Work\Work_scut\论文\05.ROI\exp\caltech\S1-G0-7-frcnn_VGG16_C4\detectron-output\test\caltech_test_1x\generalized_rcnn\caltech_eval\UsaTest';
-caltech_roadline = 'E:\Work\Work_scut\论文\05.ROI\exp\caltech\S1-G1-7-frcnn_VGG16_C4-roadline\detectron-output\test\caltech_test_1x_roadline\generalized_rcnn\caltech_eval\UsaTest';
-method = 'ev-All-frcnn_VGG16_C4.mat';
 
-scut = 'E:\Work\Work_scut\论文\05.ROI\exp\scut\S1-G1-7-frcnn_VGG16_C4-x1.5-180k-lr0.02\detectron-output\test\scut_test_1x\generalized_rcnn\scut_eval\scuttest';
-scut_roadline = 'E:\Work\Work_scut\论文\05.ROI\exp\scut\S1-G1-4-frcnn_VGG16_C4-roadline-acr\detectron-output\test\scut_test_1x_roadline_bak\generalized_rcnn\scut_eval\scuttest';
+res_dir = './scut/results/scuttest/';
 
-scut_roadline2 = 'E:\Work\Work_scut\论文\05.ROI\exp\scut\S1-G1-7-frcnn_VGG16_C4-roadline\detectron-output\test\scut_test_1x_roadline\generalized_rcnn\scut_eval\scuttest';
-
-[cS] = countTPFP(fullfile(caltech,method));
-[cgS] = countTPFP(fullfile(caltech_roadline,method));
-[sS] = countTPFP(fullfile(scut,method));
-[sgS] = countTPFP(fullfile(scut_roadline,method));
-[sgS2] = countTPFP(fullfile(scut_roadline2,method));
+[GPCAnet_filter] = countTPFP([res_dir 'ev-All-GPCAnet-filter.mat']);
+[FasterRCNN] = countTPFP([res_dir 'ev-All-FasterR-CNN.mat']);
+[RetinaNet] = countTPFP([res_dir 'ev-All-RetinaNet.mat']);
+[GPCAnet_RetinaNet] = countTPFP([res_dir 'ev-All-GPCAnet-RetinaNet.mat']);
 end
 
 function [S] = countTPFP(file)
@@ -21,6 +14,10 @@ gtr = R.R.gtr;
 dtr = R.R.dtr;
 dtrmat = cell2mat(dtr');
 gtrmat = cell2mat(gtr');
+[~,idx] = sort(dtrmat(:,5),'descend');
+dtrmat = dtrmat(idx,:);
+dtrmat = dtrmat(dtrmat(:,5)>=0.3,:);
+
 tp_i = dtrmat(:,6)==1;
 fp_i = dtrmat(:,6)==0;
 tp = sum(tp_i);
@@ -32,17 +29,23 @@ fp_near_i = dtrmat(fp_i,4) >=80;
 fp_medium_i = dtrmat(fp_i,4) <80;
 fp_medium_i = dtrmat(fp_i,4) >30 & fp_medium_i;
 fp_far_i = dtrmat(fp_i,4) <=30;
-
+fp_near = sum(fp_near_i);
+fp_medium = sum(fp_medium_i);
+fp_far = sum(fp_far_i);
 
 S = cstruct(dtrmat,gtrmat,gt_i,tp_i,fp_i,tp,fp,recall,fp_near_i,fp_medium_i,...
-    fp_far_i);
-% S.dtrmat = dtrmat;
-% S.gtrmat = gtrmat;
-% S.tp_i = tp_i;
-% S.fp_i = fp_i;
-% S.tp = tp;
-% S.fp = fp;
-% S.recall = recall;
+    fp_far_i,gt,fp_near,fp_medium,fp_far);
+S.dtrmat = dtrmat;
+S.gtrmat = gtrmat;
+S.tp_i = tp_i;
+S.fp_i = fp_i;
+S.tp = tp;
+S.fp = fp;
+S.recall = recall;
+S.gt = gt;
+S.fp_near = sum(fp_near_i);
+S.fp_medium = sum(fp_medium_i);
+S.fp_far = sum(fp_far_i);
 
 end
 
