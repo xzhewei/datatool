@@ -4,7 +4,10 @@ pth = pthl;
 pth_img = [pth '/extract/' type '/images/'];
 imglist = dir(pth_img);
 I = imread([pth_img imglist(f+2).name]);
-fig = figure(f);imshow(I,'border','tight');
+fig = figure(f);
+% TODO: make the visible as a args
+fig.Visible='off';
+imshow(I,'border','tight');
 if isempty(lw)
     lw = 2;
 end
