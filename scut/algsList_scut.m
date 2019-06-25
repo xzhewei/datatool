@@ -26,12 +26,14 @@ algs_ROI_paper = {
   'ACF-T-THOG',        0, clrs(6,:),   '-'
   'YOLOv2',     0, clrs(9,:),   '--'
   'YOLOv3',     0, clrs(8,:),   '-'
-%   'GPCAnet',    0, clrs(9,:),   '-'
   'MS-CNN',     0, clrs(10,:),   '--'
   'RPN+BF',     0, clrs(11,:),  '-'
   'FasterR-CNN',0, clrs(7,:),  '--'
   'GPCAnet-filter', 0, clrs(12,:),  '-'
 %   'FasterR-CNN-filter',0, clrs(14,:),  '-'
+%   'RetinaNet', 0, clrs(13,:),  '-'
+%   'GPCAnet-RetinaNet', 0, clrs(14,:),  '-'
+%    'GPCAnet',    0, clrs(9,:),   '-'
 };
 algs = algs_ROI_paper;
 end

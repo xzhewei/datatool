@@ -43,24 +43,25 @@ DIRS=dir('results');
 %  overlap  - overlap threshold for evaluation
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
-  'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
+%   'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
   'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
-  'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
+%   'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
   'Scale=near',     [80 inf],  [inf inf], 0,   .5,  1.25
   'Scale=medium',   [30 80],   [inf inf], 0,   .5,  1.25
   'Scale=far',      [20 30],   [inf inf], 0,   .5,  1.25
-  'Occ=none',       [50 inf],  [inf inf], 0,   .5,  1.25
-  'Occ=partial',    [50 inf],  [.65 1],   0,   .5,  1.25
-  'Occ=heavy',      [50 inf],  [.2 .65],  0,   .5,  1.25
-  'Ar=all',         [50 inf],  [inf inf], 0,   .5,  1.25
-  'Ar=typical',     [50 inf],  [inf inf],  .1, .5,  1.25
-  'Ar=atypical',    [50 inf],  [inf inf], -.1, .5,  1.25
-  'Overlap=25',     [50 inf],  [.65 inf], 0,   .25, 1.25
-  'Overlap=50',     [50 inf],  [.65 inf], 0,   .50, 1.25
-  'Overlap=75',     [50 inf],  [.65 inf], 0,   .75, 1.25
-  'Expand=100',     [50 inf],  [.65 inf], 0,   .5,  1.00
-  'Expand=125',     [50 inf],  [.65 inf], 0,   .5,  1.25
-  'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 };
+%   'Occ=none',       [50 inf],  [inf inf], 0,   .5,  1.25
+%   'Occ=partial',    [50 inf],  [.65 1],   0,   .5,  1.25
+%   'Occ=heavy',      [50 inf],  [.2 .65],  0,   .5,  1.25
+%   'Ar=all',         [50 inf],  [inf inf], 0,   .5,  1.25
+%   'Ar=typical',     [50 inf],  [inf inf],  .1, .5,  1.25
+%   'Ar=atypical',    [50 inf],  [inf inf], -.1, .5,  1.25
+%   'Overlap=25',     [50 inf],  [.65 inf], 0,   .25, 1.25
+%   'Overlap=50',     [50 inf],  [.65 inf], 0,   .50, 1.25
+%   'Overlap=75',     [50 inf],  [.65 inf], 0,   .75, 1.25
+%   'Expand=100',     [50 inf],  [.65 inf], 0,   .5,  1.00
+%   'Expand=125',     [50 inf],  [.65 inf], 0,   .5,  1.25
+%   'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 
+  };
 exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 
 % List of algorithms: { name, resize, color, style }
@@ -78,7 +79,7 @@ dataNames = {'UsaTest','UsaTest_new','UsaTrain','InriaTest',...
   'TudBrussels','ETH','Daimler','Japan'};
 
 % select databases, experiments and algorithms for evaluation
-dataNames = dataNames(2); % select one or more databases for evaluation
+dataNames = dataNames(1); % select one or more databases for evaluation
 exps = exps(:);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
@@ -86,7 +87,7 @@ algs = algs(:);           % select one or more algorithms for evaluation
 aspectRatio = .41;        % default aspect ratio for all bbs
 bnds = [5 5 635 475];     % discard bbs outside this pixel range
 plotRoc = 1;              % if true plot ROC else PR curves
-plotAlg = 1;              % if true one plot per alg else one plot per exp
+plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 10 .035 1];  % axis limits for ROC plots
