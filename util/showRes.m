@@ -33,7 +33,7 @@ if( evShow )
   if(gtShow), for i=1:size(gt,1), k=k+1;
       hs{k}=bbApply('draw',gt(i,1:4),cols(gt(i,5)+2),lw,gtLs); end; end
   if(dtShow), for i=1:size(dt,1), k=k+1;
-      hs{k}=bbApply('draw',dt(i,1:5),cols(dt(i,6)+2),lw,dtLs); end; end
+      hs{k}=bbApply('draw',dt(i,1:4),cols(dt(i,6)+2),lw,dtLs); end; end
 else
   if(gtShow), k=k+1; hs{k}=bbApply('draw',gt(:,1:4),cols(3),lw,gtLs); end
   if(dtShow), k=k+1; hs{k}=bbApply('draw',dt(:,1:5),cols(3),lw,dtLs); end
